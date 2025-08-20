@@ -14,7 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      faqs: {
+        Row: {
+          affected_models: string[] | null
+          answer: string
+          competitor_info: Json | null
+          created_at: string
+          id: string
+          is_published: boolean | null
+          question: string
+          slug: string
+          tags: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          affected_models?: string[] | null
+          answer: string
+          competitor_info?: Json | null
+          created_at?: string
+          id?: string
+          is_published?: boolean | null
+          question: string
+          slug: string
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          affected_models?: string[] | null
+          answer?: string
+          competitor_info?: Json | null
+          created_at?: string
+          id?: string
+          is_published?: boolean | null
+          question?: string
+          slug?: string
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
