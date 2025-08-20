@@ -2,95 +2,94 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Tesla Malaysia FAQ Hub Design System - All colors MUST be HSL */
 
 @layer base {
   :root {
+    /* Tesla Brand Colors */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 0 0% 9%;
+    
+    --tesla-red: 0 100% 50%;
+    --tesla-red-dark: 0 85% 45%;
+    --tesla-red-light: 0 100% 97%;
+    
+    --tesla-dark: 0 0% 9%;
+    --tesla-dark-light: 0 0% 15%;
+    --tesla-gray: 0 0% 25%;
+    --tesla-light-gray: 0 0% 95%;
+    --tesla-white: 0 0% 98%;
 
+    /* Semantic Colors */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 0 0% 9%;
+    --card-tesla: 0 0% 98%;
+    --card-premium: 0 0% 97%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --secondary: 0 0% 95%;
+    --secondary-foreground: 0 0% 9%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --accent: 0 100% 50%;
+    --accent-foreground: 0 0% 98%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 0 0% 95%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --border: 0 0% 90%;
+    --input: 0 0% 95%;
+    --ring: 0 100% 50%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Tesla Gradients */
+    --gradient-tesla: linear-gradient(135deg, hsl(0 0% 9%), hsl(0 0% 15%));
+    --gradient-tesla-red: linear-gradient(135deg, hsl(0 100% 50%), hsl(0 85% 45%));
+    --gradient-premium: linear-gradient(135deg, hsl(0 0% 98%), hsl(0 0% 95%));
+    --gradient-hero: linear-gradient(135deg, hsl(0 0% 9%) 0%, hsl(0 0% 15%) 50%, hsl(0 100% 50%) 100%);
+    
+    /* Shadows */
+    --shadow-tesla: 0 10px 30px -5px hsl(0 0% 0% / 0.1);
+    --shadow-tesla-red: 0 10px 30px -5px hsl(0 100% 50% / 0.2);
+    --shadow-premium: 0 20px 60px -10px hsl(0 0% 0% / 0.15);
+    
+    /* Animations */
+    --transition-tesla: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    --radius: 0.75rem;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Tesla Dark Theme */
+    --background: 0 0% 9%;
+    --foreground: 0 0% 98%;
+    
+    --card: 0 0% 15%;
+    --card-foreground: 0 0% 98%;
+    --card-tesla: 0 0% 12%;
+    --card-premium: 0 0% 18%;
+    
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+    
+    --secondary: 0 0% 18%;
+    --secondary-foreground: 0 0% 98%;
+    
+    --accent: 0 100% 50%;
+    --accent-foreground: 0 0% 98%;
+    
+    --muted: 0 0% 18%;
+    --muted-foreground: 0 0% 65%;
+    
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 98%;
+    
+    --border: 0 0% 25%;
+    --input: 0 0% 18%;
+    --ring: 0 100% 50%;
   }
 }
 
@@ -100,6 +99,44 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  .gradient-tesla {
+    background: var(--gradient-tesla);
+  }
+  
+  .gradient-tesla-red {
+    background: var(--gradient-tesla-red);
+  }
+  
+  .gradient-premium {
+    background: var(--gradient-premium);
+  }
+  
+  .gradient-hero {
+    background: var(--gradient-hero);
+  }
+  
+  .shadow-tesla {
+    box-shadow: var(--shadow-tesla);
+  }
+  
+  .shadow-tesla-red {
+    box-shadow: var(--shadow-tesla-red);
+  }
+  
+  .shadow-premium {
+    box-shadow: var(--shadow-premium);
+  }
+  
+  .transition-tesla {
+    transition: var(--transition-tesla);
   }
 }

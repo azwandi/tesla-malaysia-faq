@@ -50,17 +50,19 @@ export default {
 				},
 				card: {
 					DEFAULT: 'hsl(var(--card))',
-					foreground: 'hsl(var(--card-foreground))'
+					foreground: 'hsl(var(--card-foreground))',
+					tesla: 'hsl(var(--card-tesla))',
+					premium: 'hsl(var(--card-premium))'
 				},
-				sidebar: {
-					DEFAULT: 'hsl(var(--sidebar-background))',
-					foreground: 'hsl(var(--sidebar-foreground))',
-					primary: 'hsl(var(--sidebar-primary))',
-					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-					accent: 'hsl(var(--sidebar-accent))',
-					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-					border: 'hsl(var(--sidebar-border))',
-					ring: 'hsl(var(--sidebar-ring))'
+				tesla: {
+					red: 'hsl(var(--tesla-red))',
+					'red-dark': 'hsl(var(--tesla-red-dark))',
+					'red-light': 'hsl(var(--tesla-red-light))',
+					dark: 'hsl(var(--tesla-dark))',
+					'dark-light': 'hsl(var(--tesla-dark-light))',
+					gray: 'hsl(var(--tesla-gray))',
+					'light-gray': 'hsl(var(--tesla-light-gray))',
+					white: 'hsl(var(--tesla-white))'
 				}
 			},
 			borderRadius: {
