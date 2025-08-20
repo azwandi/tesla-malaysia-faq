@@ -4,17 +4,24 @@ import { Search, ArrowLeft, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FAQList } from "@/components/FAQ";
-import { searchFAQs } from "@/data/faqs";
+import { searchFAQs, FAQ } from "@/data/faqs";
 
 export default function SearchResults() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
-  const [results, setResults] = useState(searchFAQs(searchParams.get("q") || ""));
+  const [results, setResults] = useState<FAQ[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const query = searchParams.get("q") || "";
-    setSearchQuery(query);
-    setResults(searchFAQs(query));
+    const loadResults = async () => {
+      setLoading(true);
+      const query = searchParams.get("q") || "";
+      setSearchQuery(query);
+      const data = await searchFAQs(query);
+      setResults(data);
+      setLoading(false);
+    };
+    loadResults();
   }, [searchParams]);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -80,7 +87,12 @@ export default function SearchResults() {
         <div className="max-w-7xl mx-auto px-6">
           {/* Results Header */}
           <div className="mb-8">
-            {currentQuery ? (
+            {loading ? (
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-tesla-red mx-auto mb-4"></div>
+                <p className="text-muted-foreground">Searching...</p>
+              </div>
+            ) : currentQuery ? (
               <div className="text-center">
                 <h2 className="text-2xl font-bold mb-2">
                   Search Results for "{currentQuery}"
@@ -100,41 +112,45 @@ export default function SearchResults() {
           </div>
 
           {/* Results */}
-          {results.length > 0 ? (
-            <FAQList faqs={results} showViewAll={false} />
-          ) : (
-            <div className="text-center py-16">
-              <div className="max-w-md mx-auto">
-                <div className="w-16 h-16 rounded-full bg-tesla-red/10 flex items-center justify-center mx-auto mb-6">
-                  <AlertCircle className="w-8 h-8 text-tesla-red" />
+          {!loading && (
+            <>
+              {results.length > 0 ? (
+                <FAQList faqs={results} showViewAll={false} />
+              ) : (
+                <div className="text-center py-16">
+                  <div className="max-w-md mx-auto">
+                    <div className="w-16 h-16 rounded-full bg-tesla-red/10 flex items-center justify-center mx-auto mb-6">
+                      <AlertCircle className="w-8 h-8 text-tesla-red" />
+                    </div>
+                    <h3 className="text-xl font-bold mb-4">No Results Found</h3>
+                    <p className="text-muted-foreground mb-6">
+                      We couldn't find any questions matching "{currentQuery}". 
+                      Try different keywords or browse all questions.
+                    </p>
+                    <div className="space-y-3">
+                      <Button 
+                        onClick={() => {
+                          setSearchQuery("");
+                          setSearchParams({});
+                        }}
+                        variant="outline"
+                        className="w-full"
+                      >
+                        View All Questions
+                      </Button>
+                      <Link to="/">
+                        <Button 
+                          variant="default" 
+                          className="w-full bg-tesla-red hover:bg-tesla-red-dark"
+                        >
+                          Back to Home
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
                 </div>
-                <h3 className="text-xl font-bold mb-4">No Results Found</h3>
-                <p className="text-muted-foreground mb-6">
-                  We couldn't find any questions matching "{currentQuery}". 
-                  Try different keywords or browse all questions.
-                </p>
-                <div className="space-y-3">
-                  <Button 
-                    onClick={() => {
-                      setSearchQuery("");
-                      setSearchParams({});
-                    }}
-                    variant="outline"
-                    className="w-full"
-                  >
-                    View All Questions
-                  </Button>
-                  <Link to="/">
-                    <Button 
-                      variant="default" 
-                      className="w-full bg-tesla-red hover:bg-tesla-red-dark"
-                    >
-                      Back to Home
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
+              )}
+            </>
           )}
         </div>
       </section>

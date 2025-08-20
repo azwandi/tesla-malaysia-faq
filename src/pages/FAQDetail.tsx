@@ -1,19 +1,44 @@
 import { useParams, Link, Navigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { ArrowLeft, Car, Tag, Info, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { getFAQBySlug } from "@/data/faqs";
+import { getFAQBySlug, FAQ } from "@/data/faqs";
 
 export default function FAQDetail() {
   const { slug } = useParams<{ slug: string }>();
+  const [faq, setFaq] = useState<FAQ | null>(null);
+  const [loading, setLoading] = useState(true);
   
+  useEffect(() => {
+    const loadFAQ = async () => {
+      if (slug) {
+        const data = await getFAQBySlug(slug);
+        setFaq(data);
+      }
+      setLoading(false);
+    };
+    loadFAQ();
+  }, [slug]);
+
   if (!slug) {
     return <Navigate to="/" replace />;
   }
 
-  const faq = getFAQBySlug(slug);
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-background to-tesla-light-gray/10">
+        <div className="max-w-4xl mx-auto px-6 py-16">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-tesla-red mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading FAQ...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!faq) {
     return <Navigate to="/" replace />;
@@ -48,15 +73,15 @@ export default function FAQDetail() {
               
               {/* Meta Information */}
               <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                {faq.affectedModels.length > 0 && (
+                {faq.affected_models && faq.affected_models.length > 0 && (
                   <div className="flex items-center gap-2">
                     <Car className="w-4 h-4" />
-                    <span>Applicable to: {faq.affectedModels.join(", ")}</span>
+                    <span>Applicable to: {faq.affected_models.join(", ")}</span>
                   </div>
                 )}
                 <div className="flex items-center gap-2">
                   <Tag className="w-4 h-4" />
-                  <span>{faq.tags.length} topics covered</span>
+                  <span>{faq.tags?.length || 0} topics covered</span>
                 </div>
               </div>
             </div>
@@ -65,11 +90,11 @@ export default function FAQDetail() {
           {/* Tags and Models */}
           <div className="space-y-4">
             {/* Affected Models */}
-            {faq.affectedModels.length > 0 && (
+            {faq.affected_models && faq.affected_models.length > 0 && (
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-2">Applicable Models:</h3>
                 <div className="flex flex-wrap gap-2">
-                  {faq.affectedModels.map((model) => (
+                  {faq.affected_models.map((model) => (
                     <Badge 
                       key={model} 
                       variant="secondary"
@@ -84,20 +109,22 @@ export default function FAQDetail() {
             )}
 
             {/* Tags */}
-            <div>
-              <h3 className="text-sm font-medium text-muted-foreground mb-2">Topics:</h3>
-              <div className="flex flex-wrap gap-2">
-                {faq.tags.map((tag) => (
-                  <Badge 
-                    key={tag} 
-                    variant="outline"
-                    className="border-border/40 hover:border-tesla-red/40 hover:text-tesla-red transition-tesla"
-                  >
-                    {tag}
-                  </Badge>
-                ))}
+            {faq.tags && faq.tags.length > 0 && (
+              <div>
+                <h3 className="text-sm font-medium text-muted-foreground mb-2">Topics:</h3>
+                <div className="flex flex-wrap gap-2">
+                  {faq.tags.map((tag) => (
+                    <Badge 
+                      key={tag} 
+                      variant="outline"
+                      className="border-border/40 hover:border-tesla-red/40 hover:text-tesla-red transition-tesla"
+                    >
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 
@@ -121,18 +148,21 @@ export default function FAQDetail() {
         </Card>
 
         {/* Competitor Comparison */}
-        {faq.competitorInfo && (
+        {faq.competitor_info && (
           <Card className="mt-8 bg-gradient-to-r from-tesla-red/5 to-tesla-red/10 border-tesla-red/20 shadow-tesla-red">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-xl text-tesla-red">
                 <Car className="w-5 h-5" />
-                {faq.competitorInfo.title}
+                Competitive Advantage
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-foreground/90 leading-relaxed">
-                {faq.competitorInfo.content}
-              </p>
+              {Object.entries(faq.competitor_info).map(([key, value]) => (
+                <div key={key} className="mb-2">
+                  <strong className="capitalize">{key.replace('_', ' ')}:</strong>
+                  <span className="ml-2 text-foreground/90">{value}</span>
+                </div>
+              ))}
             </CardContent>
           </Card>
         )}
