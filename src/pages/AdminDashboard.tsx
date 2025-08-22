@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit2, Trash2, LogOut, Save, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, LogOut, Save, X, Upload, FileText } from 'lucide-react';
 
 interface FAQ {
   id: string;
@@ -28,6 +28,7 @@ const AdminDashboard = () => {
   const [editingFaq, setEditingFaq] = useState<FAQ | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const { user, signOut } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -149,6 +150,117 @@ const AdminDashboard = () => {
     navigate('/');
   };
 
+  const handleCSVUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    
+    try {
+      const text = await file.text();
+      const lines = text.split('\n').filter(line => line.trim());
+      
+      if (lines.length === 0) {
+        throw new Error('CSV file is empty');
+      }
+
+      // Parse CSV header
+      const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+      const requiredHeaders = ['slug', 'question', 'answer'];
+      
+      const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
+      if (missingHeaders.length > 0) {
+        throw new Error(`Missing required columns: ${missingHeaders.join(', ')}`);
+      }
+
+      const csvData = [];
+      
+      // Parse each row
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+        if (values.length !== headers.length) continue;
+        
+        const row: any = {};
+        headers.forEach((header, index) => {
+          row[header] = values[index];
+        });
+
+        // Process the data
+        const faqData = {
+          slug: row.slug,
+          question: row.question,
+          answer: row.answer,
+          tags: row.tags ? row.tags.split(';').map((t: string) => t.trim()).filter(Boolean) : [],
+          affected_models: row.affected_models ? row.affected_models.split(';').map((m: string) => m.trim()).filter(Boolean) : [],
+          is_published: row.is_published === 'true' || row.is_published === '1' || !row.is_published,
+          competitor_info: row.competitor_info ? JSON.parse(row.competitor_info) : null,
+        };
+
+        csvData.push(faqData);
+      }
+
+      // Process upserts
+      let createdCount = 0;
+      let updatedCount = 0;
+
+      for (const faqData of csvData) {
+        // Check if FAQ exists
+        const { data: existingFaq, error: checkError } = await supabase
+          .from('faqs')
+          .select('id')
+          .eq('slug', faqData.slug)
+          .maybeSingle();
+
+        if (checkError) {
+          console.error('Error checking existing FAQ:', checkError);
+          continue;
+        }
+
+        if (existingFaq) {
+          // Update existing FAQ
+          const { error: updateError } = await supabase
+            .from('faqs')
+            .update(faqData)
+            .eq('slug', faqData.slug);
+
+          if (updateError) {
+            console.error('Error updating FAQ:', updateError);
+          } else {
+            updatedCount++;
+          }
+        } else {
+          // Insert new FAQ
+          const { error: insertError } = await supabase
+            .from('faqs')
+            .insert([faqData]);
+
+          if (insertError) {
+            console.error('Error inserting FAQ:', insertError);
+          } else {
+            createdCount++;
+          }
+        }
+      }
+
+      toast({
+        title: "Success",
+        description: `CSV processed: ${createdCount} created, ${updatedCount} updated`,
+      });
+
+      fetchFAQs();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to process CSV",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+      // Reset file input
+      event.target.value = '';
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-tesla-dark via-background to-tesla-dark/50 flex items-center justify-center">
@@ -170,8 +282,35 @@ const AdminDashboard = () => {
               FAQ Management Dashboard
             </h1>
             <p className="text-muted-foreground">Manage Tesla Malaysia FAQ content</p>
+            <p className="text-xs text-muted-foreground/80 mt-1">
+              CSV format: slug, question, answer, tags (semicolon-separated), affected_models (semicolon-separated), is_published (true/false)
+            </p>
           </div>
           <div className="flex gap-2">
+            <input
+              type="file"
+              accept=".csv"
+              onChange={handleCSVUpload}
+              className="hidden"
+              id="csv-upload"
+            />
+            <Button
+              onClick={() => document.getElementById('csv-upload')?.click()}
+              variant="outline"
+              disabled={isUploading}
+            >
+              {isUploading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <Upload className="w-4 h-4 mr-2" />
+                  Upload CSV
+                </>
+              )}
+            </Button>
             <Button onClick={handleCreateFAQ} variant="tesla">
               <Plus className="w-4 h-4 mr-2" />
               Add FAQ
