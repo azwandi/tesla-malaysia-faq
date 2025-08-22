@@ -51,18 +51,25 @@ export default {
 				card: {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))',
-					tesla: 'hsl(var(--card-tesla))',
-					premium: 'hsl(var(--card-premium))'
+					subtle: 'hsl(var(--card-subtle))',
+					accent: 'hsl(var(--card-accent))'
 				},
-				tesla: {
-					red: 'hsl(var(--tesla-red))',
-					'red-dark': 'hsl(var(--tesla-red-dark))',
-					'red-light': 'hsl(var(--tesla-red-light))',
-					dark: 'hsl(var(--tesla-dark))',
-					'dark-light': 'hsl(var(--tesla-dark-light))',
-					gray: 'hsl(var(--tesla-gray))',
-					'light-gray': 'hsl(var(--tesla-light-gray))',
-					white: 'hsl(var(--tesla-white))'
+				gray: {
+					50: 'hsl(var(--gray-50))',
+					100: 'hsl(var(--gray-100))',
+					200: 'hsl(var(--gray-200))',
+					300: 'hsl(var(--gray-300))',
+					400: 'hsl(var(--gray-400))',
+					500: 'hsl(var(--gray-500))',
+					600: 'hsl(var(--gray-600))',
+					700: 'hsl(var(--gray-700))',
+					800: 'hsl(var(--gray-800))',
+					900: 'hsl(var(--gray-900))'
+				},
+				blue: {
+					DEFAULT: 'hsl(var(--blue))',
+					dark: 'hsl(var(--blue-dark))',
+					light: 'hsl(var(--blue-light))'
 				}
 			},
 			borderRadius: {
