@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Heart } from "lucide-react";
+import { ExternalLink, Flag } from "lucide-react";
 
 export const Footer = () => {
   return (
@@ -7,7 +7,7 @@ export const Footer = () => {
       <div className="max-w-6xl mx-auto px-4 py-3">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-muted-foreground">
-            <Heart className="w-4 h-4 text-red-500" />
+            <Flag className="w-4 h-4 text-foreground" />
             <span className="text-xs hidden sm:inline">Built with love for fellow Malaysians</span>
           </div>
           
