@@ -1,4 +1,4 @@
-import { useParams, Link, Navigate } from "react-router-dom";
+import { useParams, Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { ArrowLeft, Car, Tag, Info, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,8 @@ import { getFAQBySlug, FAQ } from "@/data/faqs";
 
 export default function FAQDetail() {
   const { slug } = useParams<{ slug: string }>();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [faq, setFaq] = useState<FAQ | null>(null);
   const [loading, setLoading] = useState(true);
   
@@ -48,17 +50,31 @@ export default function FAQDetail() {
     return <Navigate to="/" replace />;
   }
 
+  // Function to handle back navigation
+  const handleBackNavigation = () => {
+    // Check if user came from search results page
+    if (location.state?.fromSearch) {
+      // Go back to search results with the search query as URL parameter
+      navigate(`/search?q=${encodeURIComponent(location.state.searchQuery)}`);
+    } else {
+      // Go back to homepage
+      navigate('/');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
       <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
         <div className="max-w-4xl mx-auto px-6 py-4">
-          <Link to="/">
-            <Button variant="ghost" className="hover:bg-accent hover:text-accent-foreground">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to FAQ Hub
-            </Button>
-          </Link>
+          <Button 
+            variant="ghost" 
+            className="hover:bg-accent hover:text-accent-foreground"
+            onClick={handleBackNavigation}
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
         </div>
       </nav>
 

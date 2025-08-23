@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useSearchParams, Link } from "react-router-dom";
+import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import { Search, ArrowLeft, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,7 @@ export default function SearchResults() {
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
   const [results, setResults] = useState<FAQ[]>([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadResults = async () => {
@@ -115,7 +116,12 @@ export default function SearchResults() {
           {!loading && (
             <>
               {results.length > 0 ? (
-                <FAQList faqs={results} showViewAll={false} />
+                <FAQList 
+                  faqs={results} 
+                  showViewAll={false} 
+                  fromSearch={true}
+                  searchQuery={currentQuery}
+                />
               ) : (
                 <div className="text-center py-16">
                   <div className="max-w-md mx-auto">

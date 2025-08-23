@@ -9,9 +9,16 @@ import { useState, useEffect } from "react";
 interface FAQListProps {
   faqs?: FAQ[];
   showViewAll?: boolean;
+  fromSearch?: boolean; // Add this prop
+  searchQuery?: string; // Add this prop
 }
 
-export const FAQList = ({ faqs: faqList, showViewAll = true }: FAQListProps) => {
+export const FAQList = ({ 
+  faqs: faqList, 
+  showViewAll = true, 
+  fromSearch = false, 
+  searchQuery = "" 
+}: FAQListProps) => {
   const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -62,7 +69,13 @@ export const FAQList = ({ faqs: faqList, showViewAll = true }: FAQListProps) => 
               key={faq.id} 
               className="group hover:shadow-md transition-all cursor-pointer bg-card border-border"
             >
-              <Link to={`/faq/${faq.slug}`}>
+              <Link 
+                to={`/faq/${faq.slug}`}
+                state={fromSearch ? { 
+                  fromSearch: true, 
+                  searchQuery: searchQuery 
+                } : undefined}
+              >
                 <CardHeader className="pb-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1">
