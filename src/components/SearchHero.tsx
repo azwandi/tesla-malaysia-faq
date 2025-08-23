@@ -30,7 +30,7 @@ export const SearchHero = () => {
           </div>
           <h2 className="text-2xl md:text-3xl font-light text-muted-foreground mb-4">We can help with your questions</h2>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Get instant answers to your Tesla questions. From charging costs to government incentives, we've got you covered.
+            Get instant answers to your Tesla questions. From charging costs to government incentives, we've got you covered. Curated for 🇲🇾
           </p>
         </div>
 
