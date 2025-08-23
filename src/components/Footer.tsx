@@ -7,7 +7,8 @@ export const Footer = () => {
       <div className="max-w-6xl mx-auto px-4 py-3">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-muted-foreground">
-            <span className="text-xs hidden sm:inline">Hi! I share these Tesla tips to help 🇲🇾 Malaysians make the most of their EV journey. If you find them useful, consider using my referral link when you order your Tesla. You’ll get RM1,000 off — and you’ll help me keep this site running. Thank you!</span>
+            <span className="text-xs hidden xs:inline">Hi! I share these Tesla tips to help 🇲🇾 Malaysians make the most of their EV journey. If you find them useful, consider using my referral link when you order your Tesla. You'll get RM1,000 off — and you'll help me keep this site running. Thank you!</span>
+            <span className="text-xs xs:hidden">Tesla tips for  Malaysians</span>
           </div>
           
           <div className="flex items-center gap-4">
