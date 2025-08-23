@@ -16,10 +16,9 @@ export const SearchHero = () => {
     e.preventDefault();
     handleSearch(searchQuery);
   };
-  return <section className="relative min-h-[60vh] flex items-center justify-center bg-background overflow-hidden">
-      {/* Background Pattern - Removed for accessibility */}
-      <div className="absolute inset-0">
-      </div>
+  return <section className="relative min-h-[60vh] flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-100 to-indigo-200 overflow-hidden">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-blue-500/5"></div>
       
       <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
         {/* Hero Title */}
