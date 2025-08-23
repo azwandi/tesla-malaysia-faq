@@ -174,77 +174,114 @@ const AdminDashboard = () => {
       }
 
       const csvData = [];
+      const slugsInCSV = new Set<string>();
+      const errors: string[] = [];
       
-      // Parse each row
+      // Parse each row and check for duplicates within CSV
       for (let i = 1; i < lines.length; i++) {
         const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
-        if (values.length !== headers.length) continue;
+        if (values.length !== headers.length) {
+          errors.push(`Row ${i + 1}: Invalid column count`);
+          continue;
+        }
         
         const row: any = {};
         headers.forEach((header, index) => {
           row[header] = values[index];
         });
 
-        // Process the data
-        const faqData = {
-          slug: row.slug,
-          question: row.question,
-          answer: row.answer,
-          tags: row.tags ? row.tags.split(';').map((t: string) => t.trim()).filter(Boolean) : [],
-          affected_models: row.affected_models ? row.affected_models.split(';').map((m: string) => m.trim()).filter(Boolean) : [],
-          is_published: row.is_published === 'true' || row.is_published === '1' || !row.is_published,
-          competitor_info: row.competitor_info ? JSON.parse(row.competitor_info) : null,
-        };
+        // Validate required fields
+        if (!row.slug || !row.question || !row.answer) {
+          errors.push(`Row ${i + 1}: Missing required fields`);
+          continue;
+        }
 
-        csvData.push(faqData);
+        // Check for duplicate slugs within the CSV
+        if (slugsInCSV.has(row.slug)) {
+          errors.push(`Row ${i + 1}: Duplicate slug '${row.slug}' found in CSV`);
+          continue;
+        }
+        slugsInCSV.add(row.slug);
+
+        try {
+          // Process the data
+          const faqData = {
+            slug: row.slug,
+            question: row.question,
+            answer: row.answer,
+            tags: row.tags ? row.tags.split(';').map((t: string) => t.trim()).filter(Boolean) : [],
+            affected_models: row.affected_models ? row.affected_models.split(';').map((m: string) => m.trim()).filter(Boolean) : [],
+            is_published: row.is_published === 'true' || row.is_published === '1' || !row.is_published,
+            competitor_info: row.competitor_info ? (row.competitor_info.trim() ? JSON.parse(row.competitor_info) : null) : null,
+          };
+
+          csvData.push({ ...faqData, rowNumber: i + 1 });
+        } catch (parseError) {
+          errors.push(`Row ${i + 1}: Invalid JSON in competitor_info`);
+        }
       }
+
+      if (errors.length > 0) {
+        throw new Error(`CSV validation errors:\n${errors.join('\n')}`);
+      }
+
+      // Get all existing FAQs to check for conflicts
+      const { data: existingFaqs, error: fetchError } = await supabase
+        .from('faqs')
+        .select('slug')
+        .in('slug', Array.from(slugsInCSV));
+
+      if (fetchError) {
+        throw new Error(`Failed to check existing FAQs: ${fetchError.message}`);
+      }
+
+      const existingSlugs = new Set(existingFaqs?.map(f => f.slug) || []);
 
       // Process upserts
       let createdCount = 0;
       let updatedCount = 0;
+      const processingErrors: string[] = [];
 
       for (const faqData of csvData) {
-        // Check if FAQ exists
-        const { data: existingFaq, error: checkError } = await supabase
-          .from('faqs')
-          .select('id')
-          .eq('slug', faqData.slug)
-          .maybeSingle();
+        const { rowNumber, ...faqRecord } = faqData;
+        
+        try {
+          if (existingSlugs.has(faqRecord.slug)) {
+            // Update existing FAQ
+            const { error: updateError } = await supabase
+              .from('faqs')
+              .update(faqRecord)
+              .eq('slug', faqRecord.slug);
 
-        if (checkError) {
-          console.error('Error checking existing FAQ:', checkError);
-          continue;
-        }
-
-        if (existingFaq) {
-          // Update existing FAQ
-          const { error: updateError } = await supabase
-            .from('faqs')
-            .update(faqData)
-            .eq('slug', faqData.slug);
-
-          if (updateError) {
-            console.error('Error updating FAQ:', updateError);
+            if (updateError) {
+              processingErrors.push(`Row ${rowNumber}: Update failed - ${updateError.message}`);
+            } else {
+              updatedCount++;
+            }
           } else {
-            updatedCount++;
-          }
-        } else {
-          // Insert new FAQ
-          const { error: insertError } = await supabase
-            .from('faqs')
-            .insert([faqData]);
+            // Insert new FAQ
+            const { error: insertError } = await supabase
+              .from('faqs')
+              .insert([faqRecord]);
 
-          if (insertError) {
-            console.error('Error inserting FAQ:', insertError);
-          } else {
-            createdCount++;
+            if (insertError) {
+              processingErrors.push(`Row ${rowNumber}: Insert failed - ${insertError.message}`);
+            } else {
+              createdCount++;
+            }
           }
+        } catch (error) {
+          processingErrors.push(`Row ${rowNumber}: Unexpected error - ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
       }
 
+      const successMessage = `CSV processed: ${createdCount} created, ${updatedCount} updated`;
+      const errorMessage = processingErrors.length > 0 ? `\n\nErrors:\n${processingErrors.slice(0, 5).join('\n')}${processingErrors.length > 5 ? '\n...and more' : ''}` : '';
+
       toast({
-        title: "Success",
-        description: `CSV processed: ${createdCount} created, ${updatedCount} updated`,
+        title: processingErrors.length === 0 ? "Success" : "Partially Completed",
+        description: successMessage + errorMessage,
+        variant: processingErrors.length === 0 ? "default" : "destructive",
       });
 
       fetchFAQs();
