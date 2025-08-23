@@ -23,6 +23,10 @@ export default function FAQDetail() {
     loadFAQ();
   }, [slug]);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   if (!slug) {
     return <Navigate to="/" replace />;
   }
