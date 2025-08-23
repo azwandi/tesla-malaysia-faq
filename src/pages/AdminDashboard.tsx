@@ -164,8 +164,41 @@ const AdminDashboard = () => {
         throw new Error('CSV file is empty');
       }
 
+      // Function to parse CSV line properly handling quoted fields
+      const parseCSVLine = (line: string): string[] => {
+        const result: string[] = [];
+        let current = '';
+        let inQuotes = false;
+        
+        for (let i = 0; i < line.length; i++) {
+          const char = line[i];
+          const nextChar = line[i + 1];
+          
+          if (char === '"') {
+            if (inQuotes && nextChar === '"') {
+              // Escaped quote
+              current += '"';
+              i++; // Skip next quote
+            } else {
+              // Toggle quote state
+              inQuotes = !inQuotes;
+            }
+          } else if (char === ',' && !inQuotes) {
+            // End of field
+            result.push(current.trim());
+            current = '';
+          } else {
+            current += char;
+          }
+        }
+        
+        // Add the last field
+        result.push(current.trim());
+        return result;
+      };
+
       // Parse CSV header
-      const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+      const headers = parseCSVLine(lines[0]);
       const requiredHeaders = ['slug', 'question', 'answer'];
       
       const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
@@ -179,9 +212,9 @@ const AdminDashboard = () => {
       
       // Parse each row and check for duplicates within CSV
       for (let i = 1; i < lines.length; i++) {
-        const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+        const values = parseCSVLine(lines[i]);
         if (values.length !== headers.length) {
-          errors.push(`Row ${i + 1}: Invalid column count`);
+          errors.push(`Row ${i + 1}: Expected ${headers.length} columns, got ${values.length}`);
           continue;
         }
         
