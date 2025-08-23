@@ -90,7 +90,7 @@ export default function SearchResults() {
           <div className="mb-8">
             {loading ? (
               <div className="text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-tesla-red mx-auto mb-4"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
                 <p className="text-muted-foreground">Searching...</p>
               </div>
             ) : currentQuery ? (
@@ -124,30 +124,30 @@ export default function SearchResults() {
                 />
               ) : (
                 <div className="text-center py-16">
-                  <div className="max-w-md mx-auto">
-                    <div className="w-16 h-16 rounded-full bg-tesla-red/10 flex items-center justify-center mx-auto mb-6">
-                      <AlertCircle className="w-8 h-8 text-tesla-red" />
+                  <div className="max-w-2xl mx-auto">
+                    <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
+                      <AlertCircle className="w-10 h-10 text-primary" />
                     </div>
-                    <h3 className="text-xl font-bold mb-4">No Results Found</h3>
-                    <p className="text-muted-foreground mb-6">
+                    <h3 className="text-2xl font-bold mb-4">No Results Found</h3>
+                    <p className="text-muted-foreground mb-8 text-lg">
                       We couldn't find any questions matching "{currentQuery}". 
                       Try different keywords or browse all questions.
                     </p>
-                    <div className="space-y-3">
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
                       <Button 
                         onClick={() => {
                           setSearchQuery("");
                           setSearchParams({});
                         }}
                         variant="outline"
-                        className="w-full"
+                        className="flex-1 sm:flex-none"
                       >
                         View All Questions
                       </Button>
                       <Link to="/">
                         <Button 
                           variant="default" 
-                          className="w-full bg-tesla-red hover:bg-tesla-red-dark"
+                          className="flex-1 sm:flex-none bg-primary hover:bg-primary/90"
                         >
                           Back to Home
                         </Button>
