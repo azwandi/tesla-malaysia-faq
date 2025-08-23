@@ -16,7 +16,7 @@ export const SearchHero = () => {
     e.preventDefault();
     handleSearch(searchQuery);
   };
-  return <section className="relative min-h-[60vh] flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-100 to-indigo-200 overflow-hidden">
+  return <section className="relative min-h-[80vh] sm:min-h-[60vh] flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-100 to-indigo-200 overflow-hidden pt-16 sm:pt-0">
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-blue-500/5"></div>
       
@@ -36,7 +36,7 @@ export const SearchHero = () => {
           <div className="relative max-w-2xl mx-auto">
             <div className="relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <Input type="text" placeholder="Ask anything about Tesla in Malaysia..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-12 pr-32 py-6 text-lg bg-card border border-border focus-visible:ring-ring focus-visible:ring-2" />
+              <Input type="text" placeholder="Ask anything about Tesla in Malaysia..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-12 pr-36 py-6 text-lg bg-card border border-border focus-visible:ring-ring focus-visible:ring-2" />
               <Button type="submit" variant="default" size="lg" className="absolute right-2 top-1/2 -translate-y-1/2 bg-primary hover:bg-primary/90 text-primary-foreground px-6">
                 Search
               </Button>
