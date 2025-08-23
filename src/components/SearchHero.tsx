@@ -27,7 +27,7 @@ export const SearchHero = () => {
             <h1 className="text-5xl md:text-6xl font-bold text-foreground">Buying a Tesla? Got questions?</h1>
           </div>
           <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-            We've got the answers. Curated for 🇲🇾 Malaysians. <br />From charging costs to government incentives, we've got you covered.
+            We've got the answers. Curated for 🇲🇾 Malaysians. From charging costs to government incentives, we've got you covered.
           </p>
         </div>
 
@@ -45,7 +45,7 @@ export const SearchHero = () => {
         </form>
 
         {/* Popular Search Terms */}
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-3xl mx-auto mb-16">
           <p className="text-muted-foreground mb-4 text-sm">Popular searches:</p>
           <div className="flex flex-wrap justify-center gap-2">
             {popularSearchTerms.map(term => <Button key={term} variant="outline" size="sm" onClick={() => handleSearch(term)} className="border-border text-foreground hover:bg-accent hover:text-accent-foreground">
