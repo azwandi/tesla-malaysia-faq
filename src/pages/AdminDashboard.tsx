@@ -154,6 +154,17 @@ const AdminDashboard = () => {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    // Check authentication first
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      toast({
+        title: "Authentication Required",
+        description: "You must be logged in to upload FAQs",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsUploading(true);
     
     try {
