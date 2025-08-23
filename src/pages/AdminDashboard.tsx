@@ -270,41 +270,43 @@ const AdminDashboard = () => {
 
       const existingSlugs = new Set(existingFaqs?.map(f => f.slug) || []);
 
-      // Process upserts
+      // Process upserts using Supabase's native upsert functionality
       let createdCount = 0;
       let updatedCount = 0;
       const processingErrors: string[] = [];
 
-      for (const faqData of csvData) {
-        const { rowNumber, ...faqRecord } = faqData;
+      // Process in batches to avoid overwhelming the database
+      const batchSize = 10;
+      for (let i = 0; i < csvData.length; i += batchSize) {
+        const batch = csvData.slice(i, i + batchSize);
         
-        try {
-          if (existingSlugs.has(faqRecord.slug)) {
-            // Update existing FAQ
-            const { error: updateError } = await supabase
+        for (const faqData of batch) {
+          const { rowNumber, ...faqRecord } = faqData;
+          
+          try {
+            // Use upsert with on_conflict to handle duplicates
+            const { data, error } = await supabase
               .from('faqs')
-              .update(faqRecord)
-              .eq('slug', faqRecord.slug);
+              .upsert(faqRecord, { 
+                onConflict: 'slug',
+                ignoreDuplicates: false 
+              })
+              .select('id');
 
-            if (updateError) {
-              processingErrors.push(`Row ${rowNumber}: Update failed - ${updateError.message}`);
+            if (error) {
+              processingErrors.push(`Row ${rowNumber}: ${error.message}`);
             } else {
-              updatedCount++;
+              // Check if this was an insert or update by seeing if slug existed
+              const wasExisting = existingSlugs.has(faqRecord.slug);
+              if (wasExisting) {
+                updatedCount++;
+              } else {
+                createdCount++;
+              }
             }
-          } else {
-            // Insert new FAQ
-            const { error: insertError } = await supabase
-              .from('faqs')
-              .insert([faqRecord]);
-
-            if (insertError) {
-              processingErrors.push(`Row ${rowNumber}: Insert failed - ${insertError.message}`);
-            } else {
-              createdCount++;
-            }
+          } catch (error) {
+            processingErrors.push(`Row ${rowNumber}: ${error instanceof Error ? error.message : 'Unknown error'}`);
           }
-        } catch (error) {
-          processingErrors.push(`Row ${rowNumber}: Unexpected error - ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
       }
 
