@@ -369,9 +369,9 @@ const AdminDashboard = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-tesla-dark via-background to-tesla-dark/50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-tesla-accent mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-muted-foreground">Loading admin dashboard...</p>
         </div>
       </div>
@@ -379,12 +379,12 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-tesla-dark via-background to-tesla-dark/50">
+    <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-tesla-accent to-tesla-accent/80 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold text-foreground">
               FAQ Management Dashboard
             </h1>
             <p className="text-muted-foreground">Manage Tesla Malaysia FAQ content</p>
@@ -417,7 +417,7 @@ const AdminDashboard = () => {
                 </>
               )}
             </Button>
-            <Button onClick={handleCreateFAQ} variant="tesla">
+            <Button onClick={handleCreateFAQ} variant="default">
               <Plus className="w-4 h-4 mr-2" />
               Add FAQ
             </Button>
@@ -431,7 +431,7 @@ const AdminDashboard = () => {
         {/* FAQ List */}
         <div className="grid gap-6">
           {faqs.map((faq) => (
-            <Card key={faq.id} className="bg-background/95 backdrop-blur-sm border-tesla-accent/20">
+            <Card key={faq.id} className="bg-card border-border">
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
@@ -572,7 +572,7 @@ const AdminDashboard = () => {
                   </label>
                 </div>
                 <div className="flex gap-2 pt-4">
-                  <Button onClick={() => handleSaveFAQ(editingFaq)} variant="tesla">
+                  <Button onClick={() => handleSaveFAQ(editingFaq)} variant="default">
                     <Save className="w-4 h-4 mr-2" />
                     {isCreating ? 'Create' : 'Save'}
                   </Button>

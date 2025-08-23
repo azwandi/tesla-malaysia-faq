@@ -31,7 +31,7 @@ export const FAQList = ({ faqs: faqList, showViewAll = true }: FAQListProps) => 
 
   if (loading) {
     return (
-      <section className="py-16 bg-gradient-to-b from-background to-tesla-light-gray/20">
+      <section className="py-16 bg-background">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Frequently Asked Questions</h2>
@@ -45,7 +45,7 @@ export const FAQList = ({ faqs: faqList, showViewAll = true }: FAQListProps) => 
   const displayFaqs = showViewAll ? faqs.slice(0, 6) : faqs;
 
   return (
-    <section className="py-16 bg-gradient-to-b from-background to-tesla-light-gray/20">
+    <section className="py-16 bg-background">
       <div className="max-w-7xl mx-auto px-6">
         {showViewAll && (
           <div className="text-center mb-16">
@@ -60,14 +60,14 @@ export const FAQList = ({ faqs: faqList, showViewAll = true }: FAQListProps) => 
           {displayFaqs.map((faq) => (
             <Card 
               key={faq.id} 
-              className="group hover:shadow-tesla transition-tesla cursor-pointer bg-card-tesla/50 backdrop-blur-sm border-border/50"
+              className="group hover:shadow-md transition-all cursor-pointer bg-card border-border"
             >
               <Link to={`/faq/${faq.slug}`}>
                 <CardHeader className="pb-4">
                   <div className="flex items-start justify-between gap-3">
-                    <Zap className="w-6 h-6 text-tesla-red mt-1 flex-shrink-0" />
+                    <Zap className="w-6 h-6 text-primary mt-1 flex-shrink-0" />
                     <div className="flex-1">
-                      <CardTitle className="text-lg mb-2 group-hover:text-tesla-red transition-tesla">
+                      <CardTitle className="text-lg mb-2 group-hover:text-primary transition-colors">
                         {faq.question}
                       </CardTitle>
                       <CardDescription className="text-sm line-clamp-3">
@@ -85,7 +85,7 @@ export const FAQList = ({ faqs: faqList, showViewAll = true }: FAQListProps) => 
                         <Badge 
                           key={model} 
                           variant="secondary" 
-                          className="text-xs bg-tesla-red/10 text-tesla-red border-tesla-red/20"
+                          className="text-xs"
                         >
                           <Car className="w-3 h-3 mr-1" />
                           {model}
@@ -105,7 +105,7 @@ export const FAQList = ({ faqs: faqList, showViewAll = true }: FAQListProps) => 
                       <Badge 
                         key={tag} 
                         variant="outline"
-                        className="text-xs border-border/40 hover:border-tesla-red/40 hover:text-tesla-red transition-tesla"
+                        className="text-xs"
                       >
                         {tag}
                       </Badge>
@@ -117,7 +117,7 @@ export const FAQList = ({ faqs: faqList, showViewAll = true }: FAQListProps) => 
                     <Button 
                       variant="ghost" 
                       size="sm"
-                      className="text-tesla-red hover:text-tesla-red-dark hover:bg-tesla-red/5 p-0"
+                      className="text-primary hover:text-primary/80 hover:bg-accent p-0"
                     >
                       Read full answer
                       <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
@@ -126,7 +126,7 @@ export const FAQList = ({ faqs: faqList, showViewAll = true }: FAQListProps) => 
                     {faq.competitor_info && (
                       <Badge 
                         variant="secondary"
-                        className="text-xs bg-tesla-red/5 text-tesla-red border-tesla-red/20"
+                        className="text-xs"
                       >
                         Comparison
                       </Badge>
@@ -139,19 +139,19 @@ export const FAQList = ({ faqs: faqList, showViewAll = true }: FAQListProps) => 
 
           {/* View All Questions Card */}
           {showViewAll && faqs.length > 6 && (
-            <Card className="group hover:shadow-tesla-red transition-tesla cursor-pointer gradient-tesla-red text-white">
+            <Card className="group hover:shadow-md transition-all cursor-pointer bg-primary text-primary-foreground">
               <Link to="/search">
                 <CardContent className="flex flex-col items-center justify-center h-full text-center p-8">
                   <div className="mb-4">
-                    <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mb-4">
-                      <ArrowRight className="w-8 h-8 text-white group-hover:translate-x-1 transition-transform" />
+                    <div className="w-16 h-16 rounded-full bg-primary-foreground/20 flex items-center justify-center mb-4">
+                      <ArrowRight className="w-8 h-8 text-primary-foreground group-hover:translate-x-1 transition-transform" />
                     </div>
                     <h3 className="text-xl font-bold mb-2">View All Questions</h3>
-                    <p className="text-white/80 text-sm">
+                    <p className="text-primary-foreground/80 text-sm">
                       Explore our complete FAQ database with advanced search
                     </p>
                   </div>
-                  <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+                  <Badge variant="secondary" className="bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30">
                     {faqs.length} questions
                   </Badge>
                 </CardContent>

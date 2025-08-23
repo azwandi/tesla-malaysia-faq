@@ -29,10 +29,10 @@ export default function FAQDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-tesla-light-gray/10">
+      <div className="min-h-screen bg-background">
         <div className="max-w-4xl mx-auto px-6 py-16">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-tesla-red mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
             <p className="text-muted-foreground">Loading FAQ...</p>
           </div>
         </div>
@@ -45,12 +45,12 @@ export default function FAQDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-tesla-light-gray/10">
+    <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border/50">
+      <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
         <div className="max-w-4xl mx-auto px-6 py-4">
           <Link to="/">
-            <Button variant="ghost" className="hover:bg-tesla-red/5 hover:text-tesla-red">
+            <Button variant="ghost" className="hover:bg-accent hover:text-accent-foreground">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to FAQ Hub
             </Button>
@@ -63,8 +63,8 @@ export default function FAQDetail() {
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-start gap-4 mb-6">
-            <div className="w-12 h-12 rounded-full gradient-tesla-red flex items-center justify-center flex-shrink-0 mt-1">
-              <Zap className="w-6 h-6 text-white" />
+            <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-1">
+              <Zap className="w-6 h-6 text-primary-foreground" />
             </div>
             <div className="flex-1">
               <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-4">
@@ -98,7 +98,7 @@ export default function FAQDetail() {
                     <Badge 
                       key={model} 
                       variant="secondary"
-                      className="bg-tesla-red/10 text-tesla-red border-tesla-red/20"
+                      className=""
                     >
                       <Car className="w-3 h-3 mr-1" />
                       {model}
@@ -117,7 +117,7 @@ export default function FAQDetail() {
                     <Badge 
                       key={tag} 
                       variant="outline"
-                      className="border-border/40 hover:border-tesla-red/40 hover:text-tesla-red transition-tesla"
+                      className=""
                     >
                       {tag}
                     </Badge>
@@ -131,10 +131,10 @@ export default function FAQDetail() {
         <Separator className="my-8" />
 
         {/* Answer */}
-        <Card className="bg-card-tesla/30 backdrop-blur-sm border-border/50 shadow-tesla">
+        <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-xl">
-              <Info className="w-5 h-5 text-tesla-red" />
+              <Info className="w-5 h-5 text-primary" />
               Detailed Answer
             </CardTitle>
           </CardHeader>
@@ -149,9 +149,9 @@ export default function FAQDetail() {
 
         {/* Competitor Comparison */}
         {faq.competitor_info && (
-          <Card className="mt-8 bg-gradient-to-r from-tesla-red/5 to-tesla-red/10 border-tesla-red/20 shadow-tesla-red">
+          <Card className="mt-8 bg-accent/20 border-border">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-xl text-tesla-red">
+              <CardTitle className="flex items-center gap-2 text-xl text-foreground">
                 <Car className="w-5 h-5" />
                 Competitive Advantage
               </CardTitle>
@@ -168,7 +168,7 @@ export default function FAQDetail() {
         )}
 
         {/* Navigation */}
-        <div className="mt-12 pt-8 border-t border-border/50">
+        <div className="mt-12 pt-8 border-t border-border">
           <div className="flex flex-col sm:flex-row gap-4 justify-between">
             <Link to="/">
               <Button variant="outline" className="w-full sm:w-auto">
@@ -179,7 +179,7 @@ export default function FAQDetail() {
             <Link to="/search">
               <Button 
                 variant="default" 
-                className="w-full sm:w-auto bg-tesla-red hover:bg-tesla-red-dark"
+                className="w-full sm:w-auto"
               >
                 Search More Questions
                 <Zap className="w-4 h-4 ml-2" />

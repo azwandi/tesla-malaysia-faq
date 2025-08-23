@@ -34,14 +34,14 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-tesla-dark via-background to-tesla-dark/50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <Card className="bg-background/95 backdrop-blur-sm border-tesla-accent/20">
+        <Card className="bg-card border-border">
           <CardHeader className="text-center">
-            <div className="mx-auto mb-4 w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center">
-              <Lock className="w-6 h-6 text-white" />
+            <div className="mx-auto mb-4 w-12 h-12 bg-primary rounded-full flex items-center justify-center">
+              <Lock className="w-6 h-6 text-primary-foreground" />
             </div>
-            <CardTitle className="text-2xl font-bold bg-gradient-to-r from-tesla-accent to-tesla-accent/80 bg-clip-text text-transparent">
+            <CardTitle className="text-2xl font-bold text-foreground">
               Admin Login
             </CardTitle>
             <CardDescription>
@@ -62,7 +62,7 @@ const AdminLogin = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="focus:ring-tesla-accent focus:border-tesla-accent"
+                  className="focus:ring-ring focus:border-ring"
                 />
               </div>
               <div className="space-y-2">
@@ -77,14 +77,14 @@ const AdminLogin = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="focus:ring-tesla-accent focus:border-tesla-accent"
+                  className="focus:ring-ring focus:border-ring"
                 />
               </div>
             </CardContent>
             <CardFooter>
               <Button
                 type="submit"
-                variant="tesla"
+                variant="default"
                 size="lg"
                 className="w-full"
                 disabled={isLoading}
