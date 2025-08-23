@@ -10,15 +10,6 @@ const Index = () => {
       <SearchHero />
       <FAQList />
       
-      {/* Admin Access Button */}
-      <div className="fixed bottom-6 right-6">
-        <Link to="/admin/login">
-          <Button variant="outline" size="sm" className="bg-background/95 backdrop-blur-sm">
-            <Shield className="w-4 h-4 mr-2" />
-            Admin
-          </Button>
-        </Link>
-      </div>
     </div>
   );
 };
