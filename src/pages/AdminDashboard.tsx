@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Edit2, Trash2, LogOut, Save, X, Upload, FileText } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 
 interface FAQ {
   id: string;
@@ -148,6 +149,28 @@ const AdminDashboard = () => {
   const handleSignOut = async () => {
     await signOut();
     navigate('/');
+  };
+
+  const handleTogglePublished = async (faq: FAQ) => {
+    try {
+      const { error } = await supabase
+        .from('faqs')
+        .update({ is_published: !faq.is_published })
+        .eq('id', faq.id);
+
+      if (error) throw error;
+      toast({ 
+        title: "Success", 
+        description: `FAQ ${!faq.is_published ? 'published' : 'unpublished'} successfully` 
+      });
+      fetchFAQs();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update FAQ status",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleCSVUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -451,10 +474,17 @@ const AdminDashboard = () => {
                 <p className="text-sm text-muted-foreground line-clamp-3">
                   {faq.answer.substring(0, 200)}...
                 </p>
-                <div className="mt-2">
+                <div className="mt-2 flex items-center justify-between">
                   <Badge variant={faq.is_published ? "default" : "destructive"}>
                     {faq.is_published ? "Published" : "Draft"}
                   </Badge>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">Quick toggle:</span>
+                    <Switch
+                      checked={faq.is_published}
+                      onCheckedChange={() => handleTogglePublished(faq)}
+                    />
+                  </div>
                 </div>
               </CardContent>
             </Card>
