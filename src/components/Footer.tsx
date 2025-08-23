@@ -13,7 +13,7 @@ export const Footer = () => {
           
           <div className="flex items-center gap-4">
             <p className="text-xs text-foreground hidden md:block">
-              Get <strong>RM1,000 off</strong> your Tesla through my referral link
+              Get <strong>RM1,000 off</strong> your new Tesla through my referral link
             </p>
             
             <Button asChild variant="default" size="sm" className="bg-primary hover:bg-primary/90 shrink-0">
