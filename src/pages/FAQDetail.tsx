@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { getFAQBySlug, FAQ } from "@/data/faqs";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export default function FAQDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -148,9 +150,24 @@ export default function FAQDetail() {
           </CardHeader>
           <CardContent>
             <div className="prose prose-gray max-w-none">
-              <p className="text-lg leading-relaxed whitespace-pre-line">
+              <ReactMarkdown 
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  p: ({children}) => <p className="text-lg leading-relaxed mb-4">{children}</p>,
+                  strong: ({children}) => <strong className="font-semibold text-foreground">{children}</strong>,
+                  em: ({children}) => <em className="italic text-foreground">{children}</em>,
+                  code: ({children}) => <code className="bg-muted px-1 py-0.5 rounded text-sm font-mono">{children}</code>,
+                  h1: ({children}) => <h1 className="text-2xl font-bold text-foreground mb-4">{children}</h1>,
+                  h2: ({children}) => <h2 className="text-xl font-bold text-foreground mb-3">{children}</h2>,
+                  h3: ({children}) => <h3 className="text-lg font-bold text-foreground mb-2">{children}</h3>,
+                  ul: ({children}) => <ul className="list-disc list-inside mb-4 space-y-1">{children}</ul>,
+                  ol: ({children}) => <ol className="list-decimal list-inside mb-4 space-y-1">{children}</ol>,
+                  li: ({children}) => <li className="text-foreground">{children}</li>,
+                  blockquote: ({children}) => <blockquote className="border-l-4 border-primary pl-4 italic text-foreground/80 mb-4">{children}</blockquote>,
+                }}
+              >
                 {faq.answer}
-              </p>
+              </ReactMarkdown>
             </div>
           </CardContent>
         </Card>
