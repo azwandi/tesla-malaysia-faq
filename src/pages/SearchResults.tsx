@@ -74,7 +74,7 @@ export default function SearchResults() {
               <Button 
                 type="submit"
                 variant="default"
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-tesla-red hover:bg-tesla-red-dark text-white px-6"
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-primary hover:bg-primary/90 text-primary-foreground px-6"
               >
                 Search
               </Button>

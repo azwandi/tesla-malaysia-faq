@@ -70,7 +70,12 @@ export default {
 					DEFAULT: 'hsl(var(--blue))',
 					dark: 'hsl(var(--blue-dark))',
 					light: 'hsl(var(--blue-light))'
-				}
+				},
+				'tesla-red': '#e31e24',
+				'tesla-red-dark': '#b91c1f',
+				'tesla-light-gray': '#f8f9fa',
+				'tesla-gray': '#6c757d',
+				'card-tesla': 'rgba(255, 255, 255, 0.9)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
