@@ -28,7 +28,6 @@ export const SearchHero = () => {
             <Zap className="w-12 h-12 text-primary" />
             <h1 className="text-5xl md:text-6xl font-bold text-foreground">Getting a Tesla in Malaysia?</h1>
           </div>
-          <h2 className="text-2xl md:text-3xl font-light text-muted-foreground mb-4">We can help with your questions</h2>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
             Get instant answers to your Tesla questions. From charging costs to government incentives, we've got you covered. Curated for 🇲🇾
           </p>

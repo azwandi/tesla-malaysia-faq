@@ -7,14 +7,10 @@ export const Footer = () => {
       <div className="max-w-6xl mx-auto px-4 py-3">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-muted-foreground">
-            <Heart className="w-4 h-4 text-red-500" />
-            <span className="text-xs hidden sm:inline">Built with love for fellow Malaysians</span>
+            <span className="text-xs hidden sm:inline">Hi! I share these Tesla tips to help 🇲🇾 Malaysians make the most of their EV journey. If you find them useful, consider using my referral link when you order your Tesla. You’ll get RM1,000 off — and you’ll help me keep this site running. Thank you!</span>
           </div>
           
           <div className="flex items-center gap-4">
-            <p className="text-xs text-foreground hidden md:block">
-              Get <strong>RM1,000 off</strong> your new Tesla through my referral link
-            </p>
             
             <Button asChild variant="default" size="sm" className="bg-primary hover:bg-primary/90 shrink-0">
               <a 
