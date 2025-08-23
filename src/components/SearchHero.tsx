@@ -24,7 +24,7 @@ export const SearchHero = () => {
         {/* Hero Title */}
         <div className="mb-8">
           <div className="flex items-center justify-center gap-3 mb-8">
-            <h1 className="text-5xl md:text-6xl font-bold text-foreground">Buying a Tesla but have questions?</h1>
+            <h1 className="text-5xl md:text-6xl font-bold text-foreground">Buying a Tesla? Got questions?</h1>
           </div>
           <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
             We've got the answers. Curated for 🇲🇾 Malaysians. <br />From charging costs to government incentives, we've got you covered.
