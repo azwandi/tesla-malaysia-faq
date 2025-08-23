@@ -21,15 +21,14 @@ export const SearchHero = () => {
       <div className="absolute inset-0">
       </div>
       
-      <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
+      <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
         {/* Hero Title */}
         <div className="mb-8">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Zap className="w-12 h-12 text-primary" />
-            <h1 className="text-5xl md:text-6xl font-bold text-foreground">Getting a Tesla in Malaysia?</h1>
+          <div className="flex items-center justify-center gap-3 mb-8">
+            <h1 className="text-5xl md:text-6xl font-bold text-foreground">Buying a Tesla but have questions?</h1>
           </div>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Get instant answers to your Tesla questions. From charging costs to government incentives, we've got you covered. Curated for 🇲🇾
+          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
+            We've got the answers. Curated for 🇲🇾 Malaysians. <br />From charging costs to government incentives, we've got you covered.
           </p>
         </div>
 

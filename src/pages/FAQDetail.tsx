@@ -71,19 +71,7 @@ export default function FAQDetail() {
                 {faq.question}
               </h1>
               
-              {/* Meta Information */}
-              <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                {faq.affected_models && faq.affected_models.length > 0 && (
-                  <div className="flex items-center gap-2">
-                    <Car className="w-4 h-4" />
-                    <span>Applicable to: {faq.affected_models.join(", ")}</span>
-                  </div>
-                )}
-                <div className="flex items-center gap-2">
-                  <Tag className="w-4 h-4" />
-                  <span>{faq.tags?.length || 0} topics covered</span>
-                </div>
-              </div>
+
             </div>
           </div>
 
@@ -131,7 +119,7 @@ export default function FAQDetail() {
         <Separator className="my-8" />
 
         {/* Answer */}
-        <Card className="bg-card border-border">
+        <Card className="bg-card border-none shadow-none">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-xl">
               <Info className="w-5 h-5 text-primary" />

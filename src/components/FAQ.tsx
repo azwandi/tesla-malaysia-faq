@@ -42,7 +42,7 @@ export const FAQList = ({ faqs: faqList, showViewAll = true }: FAQListProps) => 
     );
   }
 
-  const displayFaqs = showViewAll ? faqs.slice(0, 6) : faqs;
+  const displayFaqs = showViewAll ? faqs.slice(0, 9) : faqs;
 
   return (
     <section className="py-16 bg-background">
@@ -50,7 +50,7 @@ export const FAQList = ({ faqs: faqList, showViewAll = true }: FAQListProps) => 
         {showViewAll && (
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Frequently Asked Questions</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Find answers to the most common questions about owning a Tesla in Malaysia
             </p>
           </div>
@@ -65,7 +65,6 @@ export const FAQList = ({ faqs: faqList, showViewAll = true }: FAQListProps) => 
               <Link to={`/faq/${faq.slug}`}>
                 <CardHeader className="pb-4">
                   <div className="flex items-start justify-between gap-3">
-                    <Zap className="w-6 h-6 text-primary mt-1 flex-shrink-0" />
                     <div className="flex-1">
                       <CardTitle className="text-lg mb-2 group-hover:text-primary transition-colors">
                         {faq.question}
@@ -78,27 +77,6 @@ export const FAQList = ({ faqs: faqList, showViewAll = true }: FAQListProps) => 
                 </CardHeader>
                 
                 <CardContent className="pt-0">
-                  {/* Affected Models */}
-                  {faq.affected_models && faq.affected_models.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {faq.affected_models.slice(0, 3).map((model) => (
-                        <Badge 
-                          key={model} 
-                          variant="secondary" 
-                          className="text-xs"
-                        >
-                          <Car className="w-3 h-3 mr-1" />
-                          {model}
-                        </Badge>
-                      ))}
-                      {faq.affected_models.length > 3 && (
-                        <Badge variant="secondary" className="text-xs">
-                          +{faq.affected_models.length - 3} more
-                        </Badge>
-                      )}
-                    </div>
-                  )}
-
                   {/* Tags */}
                   <div className="flex flex-wrap gap-2 mb-4">
                     {faq.tags && faq.tags.slice(0, 3).map((tag) => (
@@ -117,9 +95,9 @@ export const FAQList = ({ faqs: faqList, showViewAll = true }: FAQListProps) => 
                     <Button 
                       variant="ghost" 
                       size="sm"
-                      className="text-primary hover:text-primary/80 hover:bg-accent p-0"
+                      className="text-primary hover:text-primary/80 hover:bg-accent/50 transition-colors"
                     >
-                      Read full answer
+                      Read more
                       <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                     </Button>
                     
