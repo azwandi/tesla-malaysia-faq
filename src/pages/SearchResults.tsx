@@ -40,7 +40,7 @@ export default function SearchResults() {
       <nav className="bg-background/95 backdrop-blur-sm border-b border-border/50 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <Link to="/">
-            <Button variant="ghost" className="hover:bg-tesla-red/5 hover:text-tesla-red">
+            <Button variant="ghost" className="hover:bg-accent hover:text-accent-foreground">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Home
             </Button>
@@ -146,8 +146,8 @@ export default function SearchResults() {
                       </Button>
                       <Link to="/">
                         <Button 
-                          variant="default" 
-                          className="flex-1 sm:flex-none bg-primary hover:bg-primary/90"
+                          variant="secondary" 
+                          className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white"
                         >
                           Back to Home
                         </Button>

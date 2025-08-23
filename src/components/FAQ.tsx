@@ -108,7 +108,7 @@ export const FAQList = ({
                     <Button 
                       variant="ghost" 
                       size="sm"
-                      className="text-primary hover:text-primary/80 hover:bg-accent/50 transition-colors"
+                      className="hover:bg-accent hover:text-accent-foreground transition-colors"
                     >
                       Read more
                       <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
