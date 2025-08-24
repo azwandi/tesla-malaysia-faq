@@ -42,7 +42,7 @@ export const SearchHero = () => {
             <h1 className="text-5xl md:text-6xl font-bold text-foreground">Buying a Tesla? Got questions?</h1>
           </div>
           <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-            We've got the answers. Curated for 🇾 Malaysians. From charging costs to government incentives, we've got you covered.
+            We've got the answers. Curated for Malaysians, by Malaysians 🇲🇾 
           </p>
         </div>
 
