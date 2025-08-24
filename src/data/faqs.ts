@@ -81,11 +81,14 @@ export const getFAQBySlug = async (slug: string): Promise<FAQ | null> => {
 
 export const popularSearchTerms = [
   "charging cost",
-  "government incentives", 
-  "Model 3 vs Model Y",
+  "Model 3 and Model Y",
   "maintenance cost",
-  "Autopilot safety",
-  "resale value",
-  "charging infrastructure",
-  "warranty"
+  "Autopilot",
+  "warranty",
+  "insurance",
+  "tax",
+  "FSD",
+  "battery",
+  "range",
+  "safety"
 ];
