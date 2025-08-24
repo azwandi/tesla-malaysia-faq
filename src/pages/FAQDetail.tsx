@@ -1,6 +1,6 @@
 import { useParams, Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { ArrowLeft, Car, Tag, Info, Zap } from "lucide-react";
+import { ArrowLeft, Car, Tag, Lightbulb, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -92,13 +92,11 @@ export default function FAQDetail() {
               <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-4">
                 {faq.question}
               </h1>
-              
-
             </div>
           </div>
 
           {/* Tags and Models */}
-          <div className="space-y-4">
+          <div className="ml-16 space-y-4">
             {/* Affected Models */}
             {faq.affected_models && faq.affected_models.length > 0 && (
               <div>
@@ -144,7 +142,7 @@ export default function FAQDetail() {
         <Card className="bg-card border-none shadow-none">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-xl">
-              <Info className="w-5 h-5 text-primary" />
+              <Lightbulb className="w-5 h-5 text-primary" />
               Detailed Answer
             </CardTitle>
           </CardHeader>
