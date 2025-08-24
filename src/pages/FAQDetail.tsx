@@ -164,6 +164,16 @@ export default function FAQDetail() {
                   ol: ({children}) => <ol className="list-decimal list-inside mb-4 space-y-1">{children}</ol>,
                   li: ({children}) => <li className="text-foreground">{children}</li>,
                   blockquote: ({children}) => <blockquote className="border-l-4 border-primary pl-4 italic text-foreground/80 mb-4">{children}</blockquote>,
+                  a: ({href, children}) => (
+                    <a 
+                      href={href} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-primary hover:text-primary/80 underline underline-offset-2 hover:underline-offset-4 transition-all duration-200"
+                    >
+                      {children}
+                    </a>
+                  ),
                 }}
               >
                 {faq.answer}
