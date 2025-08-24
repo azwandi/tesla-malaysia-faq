@@ -8,8 +8,9 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit2, Trash2, LogOut, Save, X, Upload, FileText } from 'lucide-react';
+import { Plus, Edit2, Trash2, LogOut, Save, X, Upload, FileText, MessageSquare, CheckCircle } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface FAQ {
   id: string;
@@ -24,10 +25,25 @@ interface FAQ {
   updated_at: string;
 }
 
+interface Feedback {
+  id: string;
+  faq_id: string;
+  contact_info: string | null;
+  feedback_text: string;
+  status: 'new' | 'reviewed' | 'resolved';
+  created_at: string;
+  faqs?: {
+    question: string;
+    slug: string;
+  };
+}
+
 const AdminDashboard = () => {
   const [faqs, setFaqs] = useState<FAQ[]>([]);
+  const [feedback, setFeedback] = useState<Feedback[]>([]);
   const [editingFaq, setEditingFaq] = useState<FAQ | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isFeedbackLoading, setIsFeedbackLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const { user, signOut } = useAuth();
@@ -40,7 +56,103 @@ const AdminDashboard = () => {
       return;
     }
     fetchFAQs();
+    fetchFeedback();
   }, [user, navigate]);
+
+  const fetchFeedback = async () => {
+    try {
+      // Fetch feedback first
+      const { data: feedbackData, error: feedbackError } = await supabase
+        .from('feedback')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (feedbackError) throw feedbackError;
+
+      // If we have feedback, fetch the related FAQ data
+      if (feedbackData && feedbackData.length > 0) {
+        const faqIds = [...new Set(feedbackData.map(fb => fb.faq_id))];
+        
+        const { data: faqData, error: faqError } = await supabase
+          .from('faqs')
+          .select('id, question, slug')
+          .in('id', faqIds);
+
+        if (faqError) throw faqError;
+
+        // Create a map for quick lookup
+        const faqMap = new Map(faqData?.map(faq => [faq.id, faq]) || []);
+
+        // Enhance feedback with FAQ data
+        const enhancedFeedback = feedbackData.map(fb => ({
+          ...fb,
+          faqs: faqMap.get(fb.faq_id)
+        })) as Feedback[];
+
+        setFeedback(enhancedFeedback);
+      } else {
+        setFeedback([]);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch feedback",
+        variant: "destructive",
+      });
+    } finally {
+      setIsFeedbackLoading(false);
+    }
+  };
+
+  const updateFeedbackStatus = async (feedbackId: string, status: 'new' | 'reviewed' | 'resolved') => {
+    try {
+      const { error } = await supabase
+        .from('feedback')
+        .update({ status })
+        .eq('id', feedbackId);
+
+      if (error) throw error;
+      
+      toast({
+        title: "Success",
+        description: `Feedback marked as ${status}`,
+      });
+      
+      fetchFeedback();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update feedback status",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const deleteFeedback = async (feedbackId: string) => {
+    if (!window.confirm('Are you sure you want to delete this feedback?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('feedback')
+        .delete()
+        .eq('id', feedbackId);
+
+      if (error) throw error;
+      
+      toast({
+        title: "Success",
+        description: "Feedback deleted successfully",
+      });
+      
+      fetchFeedback();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete feedback",
+        variant: "destructive",
+      });
+    }
+  };
 
   const fetchFAQs = async () => {
     try {
@@ -367,7 +479,7 @@ const AdminDashboard = () => {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || isFeedbackLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -385,9 +497,9 @@ const AdminDashboard = () => {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-foreground">
-              FAQ Management Dashboard
+              Admin Dashboard
             </h1>
-            <p className="text-muted-foreground">Manage Tesla Malaysia FAQ content</p>
+            <p className="text-muted-foreground">Manage Tesla Malaysia FAQ content and feedback</p>
             <p className="text-xs text-muted-foreground/80 mt-1">
               CSV format: slug, question, answer, tags (semicolon-separated), affected_models (semicolon-separated), is_published (true/false)
             </p>
@@ -428,68 +540,160 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* FAQ List */}
-        <div className="grid gap-6">
-          {faqs.map((faq) => (
-            <Card key={faq.id} className="bg-card border-border">
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <CardTitle className="text-lg mb-2">{faq.question}</CardTitle>
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      {faq.tags.map((tag) => (
-                        <Badge key={tag} variant="secondary" className="text-xs">
-                          {tag}
-                        </Badge>
-                      ))}
+        {/* Main Content Tabs */}
+        <Tabs defaultValue="faqs" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="faqs" className="flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              FAQs ({faqs.length})
+            </TabsTrigger>
+            <TabsTrigger value="feedback" className="flex items-center gap-2">
+              <MessageSquare className="w-4 h-4" />
+              Feedback ({feedback.filter(f => f.status === 'new').length} new)
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="faqs" className="mt-6">
+            {/* FAQ List */}
+            <div className="grid gap-6">
+              {faqs.map((faq) => (
+                <Card key={faq.id} className="bg-card border-border">
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <CardTitle className="text-lg mb-2">{faq.question}</CardTitle>
+                        <div className="flex flex-wrap gap-2 mb-2">
+                          {faq.tags.map((tag) => (
+                            <Badge key={tag} variant="secondary" className="text-xs">
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {faq.affected_models.map((model) => (
+                            <Badge key={model} variant="outline" className="text-xs">
+                              {model}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="flex gap-2 ml-4">
+                        <Button
+                          onClick={() => setEditingFaq(faq)}
+                          variant="outline"
+                          size="sm"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          onClick={() => handleDeleteFAQ(faq.id)}
+                          variant="outline"
+                          size="sm"
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      {faq.affected_models.map((model) => (
-                        <Badge key={model} variant="outline" className="text-xs">
-                          {model}
-                        </Badge>
-                      ))}
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground line-clamp-3">
+                      {faq.answer.substring(0, 200)}...
+                    </p>
+                    <div className="mt-2 flex items-center justify-between">
+                      <Badge variant={faq.is_published ? "default" : "destructive"}>
+                        {faq.is_published ? "Published" : "Draft"}
+                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">Quick toggle:</span>
+                        <Switch
+                          checked={faq.is_published}
+                          onCheckedChange={() => handleTogglePublished(faq)}
+                        />
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex gap-2 ml-4">
-                    <Button
-                      onClick={() => setEditingFaq(faq)}
-                      variant="outline"
-                      size="sm"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      onClick={() => handleDeleteFAQ(faq.id)}
-                      variant="outline"
-                      size="sm"
-                      className="text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="feedback" className="mt-6">
+            {/* Feedback List */}
+            <div className="grid gap-4">
+              {feedback.map((fb) => (
+                <Card key={fb.id} className="bg-card border-border">
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge 
+                            variant={fb.status === 'new' ? 'destructive' : fb.status === 'reviewed' ? 'secondary' : 'default'}
+                          >
+                            {fb.status.charAt(0).toUpperCase() + fb.status.slice(1)}
+                          </Badge>
+                          <span className="text-sm text-muted-foreground">
+                            {new Date(fb.created_at).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <div className="mb-2">
+                          <span className="text-sm font-medium text-muted-foreground">FAQ: </span>
+                          <span className="text-sm text-foreground">{fb.faqs?.question}</span>
+                        </div>
+                        {fb.contact_info && (
+                          <div className="mb-2">
+                            <span className="text-sm font-medium text-muted-foreground">Contact: </span>
+                            <span className="text-sm text-foreground">{fb.contact_info}</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex gap-2 ml-4">
+                        {fb.status !== 'reviewed' && (
+                          <Button
+                            onClick={() => updateFeedbackStatus(fb.id, 'reviewed')}
+                            variant="outline"
+                            size="sm"
+                          >
+                            <CheckCircle className="w-4 h-4" />
+                          </Button>
+                        )}
+                        {fb.status !== 'resolved' && (
+                          <Button
+                            onClick={() => updateFeedbackStatus(fb.id, 'resolved')}
+                            variant="default"
+                            size="sm"
+                          >
+                            Resolve
+                          </Button>
+                        )}
+                        <Button
+                          onClick={() => deleteFeedback(fb.id)}
+                          variant="outline"
+                          size="sm"
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-foreground whitespace-pre-wrap">
+                      {fb.feedback_text}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+              
+              {feedback.length === 0 && (
+                <div className="text-center py-8">
+                  <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">No feedback received yet</p>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground line-clamp-3">
-                  {faq.answer.substring(0, 200)}...
-                </p>
-                <div className="mt-2 flex items-center justify-between">
-                  <Badge variant={faq.is_published ? "default" : "destructive"}>
-                    {faq.is_published ? "Published" : "Draft"}
-                  </Badge>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">Quick toggle:</span>
-                    <Switch
-                      checked={faq.is_published}
-                      onCheckedChange={() => handleTogglePublished(faq)}
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
 
         {/* Edit Modal */}
         {editingFaq && (

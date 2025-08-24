@@ -53,6 +53,33 @@ export type Database = {
         }
         Relationships: []
       }
+      feedback: {
+        Row: {
+          contact_info: string | null
+          created_at: string
+          faq_id: string
+          feedback_text: string
+          id: string
+          status: string
+        }
+        Insert: {
+          contact_info?: string | null
+          created_at?: string
+          faq_id: string
+          feedback_text: string
+          id?: string
+          status?: string
+        }
+        Update: {
+          contact_info?: string | null
+          created_at?: string
+          faq_id?: string
+          feedback_text?: string
+          id?: string
+          status?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

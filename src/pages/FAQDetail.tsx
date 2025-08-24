@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { getFAQBySlug, FAQ } from "@/data/faqs";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { FeedbackForm } from "@/components/FeedbackForm";
 
 export default function FAQDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -200,8 +201,19 @@ export default function FAQDetail() {
           </Card>
         )}
 
-        {/* Navigation */}
+        {/* Feedback Section */}
         <div className="mt-12 pt-8 border-t border-border">
+          <div className="flex flex-col items-center text-center mb-6">
+            <h3 className="text-lg font-semibold mb-2">Was this helpful?</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Share your feedback to help us improve this content for fellow Malaysians.
+            </p>
+            <FeedbackForm faqId={faq.id} />
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <div className="mt-8 pt-8 border-t border-border">
           <div className="flex flex-col sm:flex-row gap-4 justify-between">
             <Link to="/">
               <Button variant="outline" className="w-full sm:w-auto">
