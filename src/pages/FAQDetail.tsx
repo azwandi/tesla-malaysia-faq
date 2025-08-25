@@ -123,13 +123,18 @@ export default function FAQDetail() {
                 <h3 className="text-sm font-medium text-muted-foreground mb-2">Topics:</h3>
                 <div className="flex flex-wrap gap-2">
                   {faq.tags.map((tag) => (
-                    <Badge 
+                    <Link 
                       key={tag} 
-                      variant="outline"
-                      className=""
+                      to={`/search?tag=${encodeURIComponent(tag)}`}
+                      className="inline-block"
                     >
-                      {tag}
-                    </Badge>
+                      <Badge 
+                        variant="outline"
+                        className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                      >
+                        {tag}
+                      </Badge>
+                    </Link>
                   ))}
                 </div>
               </div>
