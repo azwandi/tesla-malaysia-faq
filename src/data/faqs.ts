@@ -93,7 +93,7 @@ export const fetchAllTags = async (): Promise<string[]> => {
 
   // Extract and flatten all tags, then get unique ones
   const allTags = (data || []).flatMap(faq => faq.tags || []);
-  return [...new Set(allTags)].sort();
+  return [...new Set(allTags)].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
 };
 
 // Search FAQs by tag
