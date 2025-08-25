@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit2, Trash2, LogOut, Save, X, Upload, FileText, MessageSquare, CheckCircle } from 'lucide-react';
+import { Plus, Edit2, Trash2, LogOut, Save, X, Upload, FileText, MessageSquare, CheckCircle, ExternalLink } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -532,6 +532,13 @@ const AdminDashboard = () => {
             <Button onClick={handleCreateFAQ} variant="default">
               <Plus className="w-4 h-4 mr-2" />
               Add FAQ
+            </Button>
+            <Button 
+              onClick={() => window.open('/', '_blank')} 
+              variant="outline"
+            >
+              <ExternalLink className="w-4 h-4 mr-2" />
+              View Public Page
             </Button>
             <Button onClick={handleSignOut} variant="outline">
               <LogOut className="w-4 h-4 mr-2" />
