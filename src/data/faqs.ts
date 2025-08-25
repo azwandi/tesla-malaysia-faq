@@ -79,6 +79,43 @@ export const getFAQBySlug = async (slug: string): Promise<FAQ | null> => {
   } : null;
 };
 
+// Fetch all unique tags from published FAQs
+export const fetchAllTags = async (): Promise<string[]> => {
+  const { data, error } = await supabase
+    .from('faqs')
+    .select('tags')
+    .eq('is_published', true);
+
+  if (error) {
+    console.error('Error fetching tags:', error);
+    return [];
+  }
+
+  // Extract and flatten all tags, then get unique ones
+  const allTags = (data || []).flatMap(faq => faq.tags || []);
+  return [...new Set(allTags)].sort();
+};
+
+// Search FAQs by tag
+export const searchFAQsByTag = async (tag: string): Promise<FAQ[]> => {
+  const { data, error } = await supabase
+    .from('faqs')
+    .select('*')
+    .eq('is_published', true)
+    .contains('tags', [tag])
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error searching FAQs by tag:', error);
+    return [];
+  }
+
+  return (data || []).map(faq => ({
+    ...faq,
+    competitor_info: faq.competitor_info as FAQ['competitor_info']
+  }));
+};
+
 export const popularSearchTerms = [
   "charging cost",
   "Model 3 and Model Y",

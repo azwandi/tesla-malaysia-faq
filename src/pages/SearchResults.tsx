@@ -1,24 +1,45 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, Link, useNavigate } from "react-router-dom";
-import { Search, ArrowLeft, AlertCircle } from "lucide-react";
+import { Search, ArrowLeft, AlertCircle, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { FAQList } from "@/components/FAQ";
-import { searchFAQs, FAQ } from "@/data/faqs";
+import { searchFAQs, searchFAQsByTag, fetchAllTags, FAQ } from "@/data/faqs";
 
 export default function SearchResults() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
   const [results, setResults] = useState<FAQ[]>([]);
   const [loading, setLoading] = useState(false);
+  const [tags, setTags] = useState<string[]>([]);
+  const [selectedTag, setSelectedTag] = useState<string | null>(searchParams.get("tag") || null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const loadTags = async () => {
+      const tagData = await fetchAllTags();
+      setTags(tagData);
+    };
+    loadTags();
+  }, []);
 
   useEffect(() => {
     const loadResults = async () => {
       setLoading(true);
       const query = searchParams.get("q") || "";
+      const tag = searchParams.get("tag") || "";
+      
       setSearchQuery(query);
-      const data = await searchFAQs(query);
+      setSelectedTag(tag || null);
+      
+      let data: FAQ[] = [];
+      if (tag) {
+        data = await searchFAQsByTag(tag);
+      } else {
+        data = await searchFAQs(query);
+      }
+      
       setResults(data);
       setLoading(false);
     };
@@ -32,7 +53,16 @@ export default function SearchResults() {
     }
   };
 
+  const handleTagClick = (tag: string) => {
+    setSearchParams({ tag });
+  };
+
+  const clearFilters = () => {
+    setSearchParams({});
+  };
+
   const currentQuery = searchParams.get("q") || "";
+  const currentTag = searchParams.get("tag") || "";
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-tesla-light-gray/10">
@@ -86,12 +116,55 @@ export default function SearchResults() {
       {/* Results */}
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-6">
+          {/* Tag Filter Section */}
+          {tags.length > 0 && (
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-4">
+                <Tag className="w-5 h-5 text-primary" />
+                <h3 className="text-lg font-semibold">Filter by Topic</h3>
+              </div>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {selectedTag && (
+                  <Button
+                    onClick={clearFilters}
+                    variant="outline"
+                    size="sm"
+                    className="mb-2"
+                  >
+                    Clear Filters
+                  </Button>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {tags.map((tag) => (
+                  <Badge
+                    key={tag}
+                    variant={selectedTag === tag ? "default" : "outline"}
+                    className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors text-sm py-1 px-3"
+                    onClick={() => handleTagClick(tag)}
+                  >
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Results Header */}
           <div className="mb-8">
             {loading ? (
               <div className="text-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
                 <p className="text-muted-foreground">Searching...</p>
+              </div>
+            ) : currentTag ? (
+              <div className="text-center">
+                <h2 className="text-2xl font-bold mb-2">
+                  FAQs tagged with "{currentTag}"
+                </h2>
+                <p className="text-muted-foreground">
+                  Found {results.length} {results.length === 1 ? 'result' : 'results'}
+                </p>
               </div>
             ) : currentQuery ? (
               <div className="text-center">
@@ -116,12 +189,12 @@ export default function SearchResults() {
           {!loading && (
             <>
               {results.length > 0 ? (
-                <FAQList 
-                  faqs={results} 
-                  showViewAll={false} 
-                  fromSearch={true}
-                  searchQuery={currentQuery}
-                />
+                  <FAQList 
+                    faqs={results} 
+                    showViewAll={false} 
+                    fromSearch={true}
+                    searchQuery={currentQuery || currentTag}
+                  />
               ) : (
                 <div className="text-center py-16">
                   <div className="max-w-2xl mx-auto">
@@ -130,13 +203,16 @@ export default function SearchResults() {
                     </div>
                     <h3 className="text-2xl font-bold mb-4">No Results Found</h3>
                     <p className="text-muted-foreground mb-8 text-lg">
-                      We couldn't find any questions matching "{currentQuery}". 
-                      Try different keywords or browse all questions.
+                      {currentTag 
+                        ? `No FAQs found with the tag "${currentTag}". Try selecting a different tag or browse all questions.`
+                        : `We couldn't find any questions matching "${currentQuery}". Try different keywords or browse all questions.`
+                      }
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
                       <Button 
                         onClick={() => {
                           setSearchQuery("");
+                          setSelectedTag(null);
                           setSearchParams({});
                         }}
                         variant="outline"
