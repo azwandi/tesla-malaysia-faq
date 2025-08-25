@@ -586,6 +586,14 @@ const AdminDashboard = () => {
                       </div>
                       <div className="flex gap-2 ml-4">
                         <Button
+                          onClick={() => window.open(`/faq/${faq.slug}`, '_blank')}
+                          variant="outline"
+                          size="sm"
+                          title="View FAQ page"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </Button>
+                        <Button
                           onClick={() => setEditingFaq(faq)}
                           variant="outline"
                           size="sm"
