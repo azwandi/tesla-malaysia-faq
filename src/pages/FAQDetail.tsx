@@ -1,6 +1,7 @@
 import { useParams, Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { ArrowLeft, Car, Tag, Lightbulb, Zap } from "lucide-react";
+import { ArrowLeft, Car, Tag, Lightbulb, Zap, Settings } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +15,7 @@ export default function FAQDetail() {
   const { slug } = useParams<{ slug: string }>();
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [faq, setFaq] = useState<FAQ | null>(null);
   const [loading, setLoading] = useState(true);
   
@@ -69,7 +71,7 @@ export default function FAQDetail() {
     <div className="min-h-screen bg-background">
       {/* Navigation */}
       <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
-        <div className="max-w-4xl mx-auto px-6 py-4">
+        <div className="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
           <Button 
             variant="ghost" 
             className="hover:bg-accent hover:text-accent-foreground"
@@ -78,6 +80,16 @@ export default function FAQDetail() {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
+          
+          {/* Admin Edit Button */}
+          {user && (
+            <Link to="/admin">
+              <Button variant="outline" size="sm">
+                <Settings className="w-4 h-4 mr-2" />
+                Edit FAQ
+              </Button>
+            </Link>
+          )}
         </div>
       </nav>
 
