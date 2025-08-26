@@ -487,13 +487,19 @@ const AdminDashboard = () => {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="faqs" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="faqs" className="flex items-center gap-2">
-              <FileText className="w-4 h-4" />
+          <TabsList className="grid w-full grid-cols-2 h-14 p-1 bg-muted/50 rounded-lg">
+            <TabsTrigger 
+              value="faqs" 
+              className="flex items-center gap-3 h-12 px-6 text-base font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+            >
+              <FileText className="w-5 h-5" />
               FAQs ({faqs.length})
             </TabsTrigger>
-            <TabsTrigger value="feedback" className="flex items-center gap-2">
-              <MessageSquare className="w-4 h-4" />
+            <TabsTrigger 
+              value="feedback" 
+              className="flex items-center gap-3 h-12 px-6 text-base font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+            >
+              <MessageSquare className="w-5 h-5" />
               Feedback ({feedback.filter(f => f.status === 'new').length} new)
             </TabsTrigger>
           </TabsList>
