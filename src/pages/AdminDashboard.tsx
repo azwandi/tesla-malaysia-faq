@@ -8,9 +8,10 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit2, Trash2, LogOut, Save, X, Upload, FileText, MessageSquare, CheckCircle, ExternalLink } from 'lucide-react';
+import { Plus, Edit2, Trash2, LogOut, Upload, FileText, MessageSquare, CheckCircle, ExternalLink, Search, Tag, Filter, X } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { fetchAllTags } from '@/data/faqs';
 
 interface FAQ {
   id: string;
@@ -40,10 +41,18 @@ interface Feedback {
 
 const AdminDashboard = () => {
   const [faqs, setFaqs] = useState<FAQ[]>([]);
+  const [filteredFaqs, setFilteredFaqs] = useState<FAQ[]>([]);
   const [feedback, setFeedback] = useState<Feedback[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isFeedbackLoading, setIsFeedbackLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
+  
+  // Filter states
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [publishedFilter, setPublishedFilter] = useState<'all' | 'published' | 'draft'>('all');
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
+  
   const { user, signOut } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -55,7 +64,60 @@ const AdminDashboard = () => {
     }
     fetchFAQs();
     fetchFeedback();
+    loadTags();
   }, [user, navigate]);
+
+  const loadTags = async () => {
+    try {
+      const tags = await fetchAllTags();
+      setAvailableTags(tags);
+    } catch (error) {
+      console.error('Failed to load tags:', error);
+    }
+  };
+
+  // Filter FAQs whenever filters change
+  useEffect(() => {
+    let filtered = [...faqs];
+
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(faq => 
+        faq.question.toLowerCase().includes(query) ||
+        faq.answer.toLowerCase().includes(query) ||
+        faq.tags.some(tag => tag.toLowerCase().includes(query))
+      );
+    }
+
+    // Apply tag filter
+    if (selectedTag) {
+      filtered = filtered.filter(faq => faq.tags.includes(selectedTag));
+    }
+
+    // Apply published status filter
+    if (publishedFilter !== 'all') {
+      filtered = filtered.filter(faq => 
+        publishedFilter === 'published' ? faq.is_published : !faq.is_published
+      );
+    }
+
+    setFilteredFaqs(filtered);
+  }, [faqs, searchQuery, selectedTag, publishedFilter]);
+
+  const clearAllFilters = () => {
+    setSearchQuery('');
+    setSelectedTag(null);
+    setPublishedFilter('all');
+  };
+
+  const handleTagClick = (tag: string) => {
+    setSelectedTag(selectedTag === tag ? null : tag);
+  };
+
+  const handleStatusFilter = (status: 'all' | 'published' | 'draft') => {
+    setPublishedFilter(status);
+  };
 
   const fetchFeedback = async () => {
     try {
@@ -505,9 +567,94 @@ const AdminDashboard = () => {
           </TabsList>
 
           <TabsContent value="faqs" className="mt-6">
+            {/* FAQ Filters */}
+            <div className="mb-6 space-y-4">
+              <div className="flex items-center gap-2 mb-4">
+                <Filter className="w-5 h-5 text-primary" />
+                <h3 className="text-lg font-semibold">Filter FAQs</h3>
+              </div>
+              
+              {/* Search Bar */}
+              <div className="relative max-w-md">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Search FAQs..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+
+              {/* Status Filter */}
+              <div className="flex gap-2">
+                <Button
+                  variant={publishedFilter === 'all' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => handleStatusFilter('all')}
+                >
+                  All ({faqs.length})
+                </Button>
+                <Button
+                  variant={publishedFilter === 'published' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => handleStatusFilter('published')}
+                >
+                  Published ({faqs.filter(f => f.is_published).length})
+                </Button>
+                <Button
+                  variant={publishedFilter === 'draft' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => handleStatusFilter('draft')}
+                >
+                  Draft ({faqs.filter(f => !f.is_published).length})
+                </Button>
+              </div>
+
+              {/* Tag Filters */}
+              {availableTags.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Tag className="w-4 h-4 text-primary" />
+                    <span className="text-sm font-medium">Filter by Topic:</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {availableTags.map((tag) => (
+                      <Badge
+                        key={tag}
+                        variant={selectedTag === tag ? "default" : "outline"}
+                        className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                        onClick={() => handleTagClick(tag)}
+                      >
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Clear Filters */}
+              {(searchQuery || selectedTag || publishedFilter !== 'all') && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={clearAllFilters}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <X className="w-4 h-4 mr-2" />
+                  Clear All Filters
+                </Button>
+              )}
+
+              {/* Results Count */}
+              <div className="text-sm text-muted-foreground">
+                Showing {filteredFaqs.length} of {faqs.length} FAQs
+              </div>
+            </div>
+
             {/* FAQ List */}
             <div className="grid gap-6">
-              {faqs.map((faq) => (
+              {filteredFaqs.map((faq) => (
                 <Card key={faq.id} className="bg-card border-border">
                   <CardHeader>
                     <div className="flex justify-between items-start">
@@ -575,6 +722,18 @@ const AdminDashboard = () => {
                   </CardContent>
                 </Card>
               ))}
+              
+              {filteredFaqs.length === 0 && faqs.length > 0 && (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+                    <Search className="w-8 h-8 text-muted-foreground" />
+                  </div>
+                  <p className="text-muted-foreground text-lg mb-4">No FAQs match your current filters</p>
+                  <Button variant="outline" onClick={clearAllFilters}>
+                    Clear Filters
+                  </Button>
+                </div>
+              )}
             </div>
           </TabsContent>
 
