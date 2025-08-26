@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -41,10 +41,8 @@ interface Feedback {
 const AdminDashboard = () => {
   const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [feedback, setFeedback] = useState<Feedback[]>([]);
-  const [editingFaq, setEditingFaq] = useState<FAQ | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isFeedbackLoading, setIsFeedbackLoading] = useState(true);
-  const [isCreating, setIsCreating] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const { user, signOut } = useAuth();
   const { toast } = useToast();
@@ -174,68 +172,6 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleCreateFAQ = () => {
-    setEditingFaq({
-      id: '',
-      slug: '',
-      question: '',
-      answer: '',
-      tags: [],
-      affected_models: [],
-      competitor_info: null,
-      is_published: true,
-      created_at: '',
-      updated_at: '',
-    });
-    setIsCreating(true);
-  };
-
-  const handleSaveFAQ = async (faq: FAQ) => {
-    try {
-      if (isCreating) {
-        const { error } = await supabase
-          .from('faqs')
-          .insert([{
-            slug: faq.slug,
-            question: faq.question,
-            answer: faq.answer,
-            tags: faq.tags,
-            affected_models: faq.affected_models,
-            competitor_info: faq.competitor_info,
-            is_published: faq.is_published,
-          }]);
-
-        if (error) throw error;
-        toast({ title: "Success", description: "FAQ created successfully" });
-      } else {
-        const { error } = await supabase
-          .from('faqs')
-          .update({
-            slug: faq.slug,
-            question: faq.question,
-            answer: faq.answer,
-            tags: faq.tags,
-            affected_models: faq.affected_models,
-            competitor_info: faq.competitor_info,
-            is_published: faq.is_published,
-          })
-          .eq('id', faq.id);
-
-        if (error) throw error;
-        toast({ title: "Success", description: "FAQ updated successfully" });
-      }
-
-      setEditingFaq(null);
-      setIsCreating(false);
-      fetchFAQs();
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to save FAQ",
-        variant: "destructive",
-      });
-    }
-  };
 
   const handleDeleteFAQ = async (id: string) => {
     if (!window.confirm('Are you sure you want to delete this FAQ?')) return;
@@ -529,10 +465,12 @@ const AdminDashboard = () => {
                 </>
               )}
             </Button>
-            <Button onClick={handleCreateFAQ} variant="default">
-              <Plus className="w-4 h-4 mr-2" />
-              Add FAQ
-            </Button>
+            <Link to="/admin/faq/new">
+              <Button variant="default">
+                <Plus className="w-4 h-4 mr-2" />
+                Add FAQ
+              </Button>
+            </Link>
             <Button 
               onClick={() => window.open('/', '_blank')} 
               variant="outline"
@@ -593,13 +531,14 @@ const AdminDashboard = () => {
                         >
                           <ExternalLink className="w-4 h-4" />
                         </Button>
-                        <Button
-                          onClick={() => setEditingFaq(faq)}
-                          variant="outline"
-                          size="sm"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </Button>
+                        <Link to={`/admin/faq/edit/${faq.slug}`}>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </Button>
+                        </Link>
                         <Button
                           onClick={() => handleDeleteFAQ(faq.id)}
                           variant="outline"
@@ -710,105 +649,6 @@ const AdminDashboard = () => {
           </TabsContent>
         </Tabs>
 
-        {/* Edit Modal */}
-        {editingFaq && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <Card className="w-full max-w-4xl max-h-[90vh] overflow-auto bg-background">
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <CardTitle>
-                    {isCreating ? 'Create New FAQ' : 'Edit FAQ'}
-                  </CardTitle>
-                  <Button
-                    onClick={() => {
-                      setEditingFaq(null);
-                      setIsCreating(false);
-                    }}
-                    variant="outline"
-                    size="sm"
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium">Slug</label>
-                  <Input
-                    value={editingFaq.slug}
-                    onChange={(e) => setEditingFaq({ ...editingFaq, slug: e.target.value })}
-                    placeholder="unique-slug-for-url"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Question</label>
-                  <Input
-                    value={editingFaq.question}
-                    onChange={(e) => setEditingFaq({ ...editingFaq, question: e.target.value })}
-                    placeholder="Enter the FAQ question"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Answer</label>
-                  <Textarea
-                    value={editingFaq.answer}
-                    onChange={(e) => setEditingFaq({ ...editingFaq, answer: e.target.value })}
-                    placeholder="Enter the detailed answer (Markdown supported)"
-                    rows={10}
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Tags (comma-separated)</label>
-                  <Input
-                    value={editingFaq.tags.join(', ')}
-                    onChange={(e) => setEditingFaq({ 
-                      ...editingFaq, 
-                      tags: e.target.value.split(',').map(tag => tag.trim()).filter(Boolean)
-                    })}
-                    placeholder="charging, cost, government"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Affected Models (comma-separated)</label>
-                  <Input
-                    value={editingFaq.affected_models.join(', ')}
-                    onChange={(e) => setEditingFaq({ 
-                      ...editingFaq, 
-                      affected_models: e.target.value.split(',').map(model => model.trim()).filter(Boolean)
-                    })}
-                    placeholder="Model 3, Model Y, Model S"
-                  />
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="published"
-                    checked={editingFaq.is_published}
-                    onChange={(e) => setEditingFaq({ ...editingFaq, is_published: e.target.checked })}
-                  />
-                  <label htmlFor="published" className="text-sm font-medium">
-                    Published
-                  </label>
-                </div>
-                <div className="flex gap-2 pt-4">
-                  <Button onClick={() => handleSaveFAQ(editingFaq)} variant="default">
-                    <Save className="w-4 h-4 mr-2" />
-                    {isCreating ? 'Create' : 'Save'}
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      setEditingFaq(null);
-                      setIsCreating(false);
-                    }}
-                    variant="outline"
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
       </div>
     </div>
   );

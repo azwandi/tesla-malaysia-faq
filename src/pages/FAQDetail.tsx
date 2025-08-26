@@ -82,8 +82,8 @@ export default function FAQDetail() {
           </Button>
           
           {/* Admin Edit Button */}
-          {user && (
-            <Link to="/admin">
+          {user && faq && (
+            <Link to={`/admin/faq/edit/${faq.slug}`}>
               <Button variant="outline" size="sm">
                 <Settings className="w-4 h-4 mr-2" />
                 Edit FAQ

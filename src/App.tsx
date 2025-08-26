@@ -11,6 +11,7 @@ import FAQDetail from "./pages/FAQDetail";
 import SearchResults from "./pages/SearchResults";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+import FAQEditor from "./pages/FAQEditor";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,8 @@ const AppContent = () => {
         <Route path="/faq/:slug" element={<FAQDetail />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin/faq/new" element={<FAQEditor />} />
+        <Route path="/admin/faq/edit/:slug" element={<FAQEditor />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
