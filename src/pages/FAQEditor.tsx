@@ -32,6 +32,23 @@ const FAQEditor = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const isEditing = !!slug;
+  
+  // localStorage key for persisting form data
+  const storageKey = `faq-editor-${isEditing ? slug : 'new'}`;
+
+  // Save form data to localStorage whenever faq changes
+  useEffect(() => {
+    if (faq && !loading) {
+      localStorage.setItem(storageKey, JSON.stringify(faq));
+    }
+  }, [faq, storageKey, loading]);
+
+  // Clear localStorage on unmount or when navigating away
+  useEffect(() => {
+    return () => {
+      // Don't clear if we're just switching tabs, only on navigation
+    };
+  }, []);
 
   useEffect(() => {
     if (!user) {
@@ -42,6 +59,24 @@ const FAQEditor = () => {
     if (isEditing) {
       fetchFAQ();
     } else {
+      // Check for saved draft in localStorage first
+      const savedDraft = localStorage.getItem(storageKey);
+      if (savedDraft) {
+        try {
+          const parsedDraft = JSON.parse(savedDraft);
+          setFaq(parsedDraft);
+          setLoading(false);
+          toast({
+            title: "Draft Restored",
+            description: "Your unsaved changes have been restored.",
+          });
+          return;
+        } catch (error) {
+          // Invalid saved data, proceed with new FAQ
+          localStorage.removeItem(storageKey);
+        }
+      }
+      
       // Create new FAQ
       setFaq({
         id: '',
@@ -57,7 +92,7 @@ const FAQEditor = () => {
       });
       setLoading(false);
     }
-  }, [user, navigate, slug, isEditing]);
+  }, [user, navigate, slug, isEditing, storageKey, toast]);
 
   const fetchFAQ = async () => {
     try {
@@ -68,7 +103,25 @@ const FAQEditor = () => {
         .single();
 
       if (error) throw error;
-      setFaq(data);
+      
+      // Check if there's a saved draft for this FAQ
+      const savedDraft = localStorage.getItem(storageKey);
+      if (savedDraft) {
+        try {
+          const parsedDraft = JSON.parse(savedDraft);
+          setFaq(parsedDraft);
+          toast({
+            title: "Draft Restored",
+            description: "Your unsaved changes have been restored.",
+          });
+        } catch (error) {
+          // Invalid saved data, use original data
+          localStorage.removeItem(storageKey);
+          setFaq(data);
+        }
+      } else {
+        setFaq(data);
+      }
     } catch (error) {
       toast({
         title: "Error",
@@ -119,6 +172,8 @@ const FAQEditor = () => {
         toast({ title: "Success", description: "FAQ created successfully" });
       }
 
+      // Clear localStorage after successful save
+      localStorage.removeItem(storageKey);
       navigate('/admin');
     } catch (error) {
       toast({
@@ -132,6 +187,8 @@ const FAQEditor = () => {
   };
 
   const handleCancel = () => {
+    // Clear localStorage when canceling
+    localStorage.removeItem(storageKey);
     navigate('/admin');
   };
 
