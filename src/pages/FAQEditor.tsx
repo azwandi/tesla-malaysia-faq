@@ -31,6 +31,8 @@ const FAQEditor = () => {
   const [faq, setFaq] = useState<FAQ | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [tagsInput, setTagsInput] = useState('');
+  const [modelsInput, setModelsInput] = useState('');
   const isEditing = !!slug;
   
   // localStorage key for persisting form data
@@ -42,6 +44,14 @@ const FAQEditor = () => {
       localStorage.setItem(storageKey, JSON.stringify(faq));
     }
   }, [faq, storageKey, loading]);
+
+  // Sync input states with FAQ data
+  useEffect(() => {
+    if (faq) {
+      setTagsInput(faq.tags.join(', '));
+      setModelsInput(faq.affected_models.join(', '));
+    }
+  }, [faq]);
 
   // Clear localStorage on unmount or when navigating away
   useEffect(() => {
@@ -298,10 +308,11 @@ const FAQEditor = () => {
               <div>
                 <label className="text-sm font-medium mb-2 block">Tags (comma-separated)</label>
                 <Input
-                  value={faq.tags.join(', ')}
-                  onChange={(e) => setFaq({ 
+                  value={tagsInput}
+                  onChange={(e) => setTagsInput(e.target.value)}
+                  onBlur={() => setFaq({ 
                     ...faq, 
-                    tags: e.target.value.split(',').map(tag => tag.trim()).filter(Boolean)
+                    tags: tagsInput.split(',').map(tag => tag.trim()).filter(Boolean)
                   })}
                   placeholder="charging, cost, government"
                   className="w-full"
@@ -311,10 +322,11 @@ const FAQEditor = () => {
               <div>
                 <label className="text-sm font-medium mb-2 block">Affected Models (comma-separated)</label>
                 <Input
-                  value={faq.affected_models.join(', ')}
-                  onChange={(e) => setFaq({ 
+                  value={modelsInput}
+                  onChange={(e) => setModelsInput(e.target.value)}
+                  onBlur={() => setFaq({ 
                     ...faq, 
-                    affected_models: e.target.value.split(',').map(model => model.trim()).filter(Boolean)
+                    affected_models: modelsInput.split(',').map(model => model.trim()).filter(Boolean)
                   })}
                   placeholder="Model 3, Model Y, Model S"
                   className="w-full"
