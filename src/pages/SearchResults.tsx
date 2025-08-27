@@ -16,6 +16,11 @@ export default function SearchResults() {
   const [selectedTag, setSelectedTag] = useState<string | null>(searchParams.get("tag") || null);
   const navigate = useNavigate();
 
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   useEffect(() => {
     const loadTags = async () => {
       const tagData = await fetchAllTags();
