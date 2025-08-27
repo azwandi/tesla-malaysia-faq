@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Save, ArrowLeft, X } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface FAQ {
   id: string;
@@ -32,7 +33,6 @@ const FAQEditor = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [tagsInput, setTagsInput] = useState('');
-  const [modelsInput, setModelsInput] = useState('');
   const isEditing = !!slug;
   
   // localStorage key for persisting form data
@@ -49,7 +49,6 @@ const FAQEditor = () => {
   useEffect(() => {
     if (faq) {
       setTagsInput(faq.tags.join(', '));
-      setModelsInput(faq.affected_models.join(', '));
     }
   }, [faq]);
 
@@ -94,7 +93,7 @@ const FAQEditor = () => {
         question: '',
         answer: '',
         tags: [],
-        affected_models: [],
+        affected_models: ['Model 3', 'Model Y'],
         competitor_info: null,
         is_published: true,
         created_at: '',
@@ -318,17 +317,33 @@ const FAQEditor = () => {
               </div>
 
               <div>
-                <label className="text-sm font-medium mb-2 block">Affected Models (comma-separated)</label>
-                <Input
-                  value={modelsInput}
-                  onChange={(e) => setModelsInput(e.target.value)}
-                  onBlur={() => setFaq({ 
-                    ...faq, 
-                    affected_models: modelsInput.split(',').map(model => model.trim()).filter(Boolean)
-                  })}
-                  placeholder="Model 3, Model Y, Model S"
-                  className="w-full"
-                />
+                <label className="text-sm font-medium mb-2 block">Affected Models</label>
+                <div className="space-y-3">
+                  {['Model 3', 'Model Y'].map((model) => (
+                    <div key={model} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={model}
+                        checked={faq.affected_models.includes(model)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setFaq({
+                              ...faq,
+                              affected_models: [...faq.affected_models, model]
+                            });
+                          } else {
+                            setFaq({
+                              ...faq,
+                              affected_models: faq.affected_models.filter(m => m !== model)
+                            });
+                          }
+                        }}
+                      />
+                      <label htmlFor={model} className="text-sm font-medium">
+                        {model}
+                      </label>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
