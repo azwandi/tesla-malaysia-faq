@@ -158,7 +158,6 @@ const FAQEditor = () => {
             answer: faq.answer,
             tags: faq.tags,
             affected_models: faq.affected_models,
-            competitor_info: faq.competitor_info,
             is_published: faq.is_published,
           })
           .eq('id', faq.id);
@@ -174,7 +173,6 @@ const FAQEditor = () => {
             answer: faq.answer,
             tags: faq.tags,
             affected_models: faq.affected_models,
-            competitor_info: faq.competitor_info,
             is_published: faq.is_published,
           }]);
 
@@ -332,27 +330,6 @@ const FAQEditor = () => {
                   className="w-full"
                 />
               </div>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium mb-2 block">Competitor Info (JSON)</label>
-              <Textarea
-                value={faq.competitor_info ? JSON.stringify(faq.competitor_info, null, 2) : ''}
-                onChange={(e) => {
-                  try {
-                    const parsed = e.target.value ? JSON.parse(e.target.value) : null;
-                    setFaq({ ...faq, competitor_info: parsed });
-                  } catch {
-                    // Invalid JSON, keep typing
-                  }
-                }}
-                placeholder='{"advantage": "Tesla offers better range", "comparison": "30% more efficient"}'
-                rows={4}
-                className="w-full font-mono text-sm"
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Optional JSON object for competitive advantage information
-              </p>
             </div>
 
             {/* Action Buttons */}
