@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit2, Trash2, LogOut, Upload, FileText, MessageSquare, CheckCircle, ExternalLink, Search, Tag, Filter, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, LogOut, Upload, FileText, MessageSquare, CheckCircle, ExternalLink, Search, Tag, Filter, X, Car } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { fetchAllTags } from '@/data/faqs';
@@ -677,23 +677,25 @@ const AdminDashboard = () => {
             </div>
 
             {/* FAQ List */}
-            <div className="grid gap-6">
+            <div className="grid gap-4">
               {filteredFaqs.map((faq) => (
                 <Card key={faq.id} className="bg-card border-border">
-                  <CardHeader>
+                  <CardHeader className="pb-3">
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
-                        <CardTitle className="text-lg mb-2">{faq.question}</CardTitle>
+                        <CardTitle className="text-lg mb-3">{faq.question}</CardTitle>
                         <div className="flex flex-wrap gap-2 mb-2">
                           {faq.tags.map((tag) => (
-                            <Badge key={tag} variant="secondary" className="text-xs">
+                            <Badge key={tag} variant="secondary" className="text-xs flex items-center gap-1">
+                              <Tag className="w-3 h-3" />
                               {tag}
                             </Badge>
                           ))}
                         </div>
                         <div className="flex flex-wrap gap-2">
                           {faq.affected_models.map((model) => (
-                            <Badge key={model} variant="outline" className="text-xs">
+                            <Badge key={model} variant="outline" className="text-xs flex items-center gap-1">
+                              <Car className="w-3 h-3" />
                               {model}
                             </Badge>
                           ))}
@@ -727,34 +729,21 @@ const AdminDashboard = () => {
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground line-clamp-3">
-                      {faq.answer.substring(0, 200)}...
-                    </p>
-                    <div className="mt-2 space-y-2">
-                      <div className="flex items-center justify-between">
-                        <Badge variant={faq.is_published ? "default" : "destructive"}>
-                          {faq.is_published ? "Published" : "Draft"}
-                        </Badge>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-muted-foreground">Published:</span>
-                          <Switch
-                            checked={faq.is_published}
-                            onCheckedChange={() => handleTogglePublished(faq)}
-                          />
-                        </div>
+                  <CardContent className="pt-0">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">Published:</span>
+                        <Switch
+                          checked={faq.is_published}
+                          onCheckedChange={() => handleTogglePublished(faq)}
+                        />
                       </div>
-                      <div className="flex items-center justify-between">
-                        <Badge variant={faq.featured ? "secondary" : "outline"}>
-                          {faq.featured ? "Featured" : "Regular"}
-                        </Badge>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-muted-foreground">Featured:</span>
-                          <Switch
-                            checked={faq.featured}
-                            onCheckedChange={() => handleToggleFeatured(faq)}
-                          />
-                        </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">Featured:</span>
+                        <Switch
+                          checked={faq.featured}
+                          onCheckedChange={() => handleToggleFeatured(faq)}
+                        />
                       </div>
                     </div>
                   </CardContent>
