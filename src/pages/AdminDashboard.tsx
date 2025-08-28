@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -676,15 +677,29 @@ const AdminDashboard = () => {
               </div>
             </div>
 
-            {/* FAQ List */}
-            <div className="grid gap-4">
-              {filteredFaqs.map((faq) => (
-                <Card key={faq.id} className="bg-card border-border">
-                  <CardHeader className="pb-3">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <CardTitle className="text-lg mb-3">{faq.question}</CardTitle>
-                        <div className="flex flex-wrap gap-2 mb-2">
+            {/* FAQ Table */}
+            <div className="border rounded-lg overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/50">
+                    <TableHead className="w-[40%]">Question</TableHead>
+                    <TableHead className="w-[20%]">Tags</TableHead>
+                    <TableHead className="w-[20%]">Models</TableHead>
+                    <TableHead className="w-[8%] text-center">Published</TableHead>
+                    <TableHead className="w-[8%] text-center">Featured</TableHead>
+                    <TableHead className="w-[4%] text-center">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredFaqs.map((faq) => (
+                    <TableRow key={faq.id} className="hover:bg-muted/30">
+                      <TableCell className="font-medium">
+                        <div className="max-w-md">
+                          <p className="truncate text-sm">{faq.question}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
                           {faq.tags.map((tag) => (
                             <Badge key={tag} variant="secondary" className="text-xs flex items-center gap-1">
                               <Tag className="w-3 h-3" />
@@ -692,7 +707,9 @@ const AdminDashboard = () => {
                             </Badge>
                           ))}
                         </div>
-                        <div className="flex flex-wrap gap-2">
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
                           {faq.affected_models.map((model) => (
                             <Badge key={model} variant="outline" className="text-xs flex items-center gap-1">
                               <Car className="w-3 h-3" />
@@ -700,68 +717,66 @@ const AdminDashboard = () => {
                             </Badge>
                           ))}
                         </div>
-                      </div>
-                      <div className="flex gap-2 ml-4">
-                        <Button
-                          onClick={() => window.open(`/faq/${faq.slug}`, '_blank')}
-                          variant="outline"
-                          size="sm"
-                          title="View FAQ page"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                        </Button>
-                        <Link to={`/admin/faq/edit/${faq.slug}`}>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                          >
-                            <Edit2 className="w-4 h-4" />
-                          </Button>
-                        </Link>
-                        <Button
-                          onClick={() => handleDeleteFAQ(faq.id)}
-                          variant="outline"
-                          size="sm"
-                          className="text-destructive hover:text-destructive"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground">Published:</span>
+                      </TableCell>
+                      <TableCell className="text-center">
                         <Switch
                           checked={faq.is_published}
                           onCheckedChange={() => handleTogglePublished(faq)}
                         />
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground">Featured:</span>
+                      </TableCell>
+                      <TableCell className="text-center">
                         <Switch
                           checked={faq.featured}
                           onCheckedChange={() => handleToggleFeatured(faq)}
                         />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-              
-              {filteredFaqs.length === 0 && faqs.length > 0 && (
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
-                    <Search className="w-8 h-8 text-muted-foreground" />
-                  </div>
-                  <p className="text-muted-foreground text-lg mb-4">No FAQs match your current filters</p>
-                  <Button variant="outline" onClick={clearAllFilters}>
-                    Clear Filters
-                  </Button>
-                </div>
-              )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-1">
+                          <Button
+                            onClick={() => window.open(`/faq/${faq.slug}`, '_blank')}
+                            variant="ghost"
+                            size="sm"
+                            title="View FAQ page"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                          </Button>
+                          <Link to={`/admin/faq/edit/${faq.slug}`}>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              title="Edit FAQ"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </Button>
+                          </Link>
+                          <Button
+                            onClick={() => handleDeleteFAQ(faq.id)}
+                            variant="ghost"
+                            size="sm"
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                            title="Delete FAQ"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
+            
+            {filteredFaqs.length === 0 && faqs.length > 0 && (
+              <div className="text-center py-8">
+                <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+                  <Search className="w-8 h-8 text-muted-foreground" />
+                </div>
+                <p className="text-muted-foreground text-lg mb-4">No FAQs match your current filters</p>
+                <Button variant="outline" onClick={clearAllFilters}>
+                  Clear Filters
+                </Button>
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="feedback" className="mt-6">
