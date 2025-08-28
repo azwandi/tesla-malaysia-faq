@@ -12,6 +12,7 @@ export interface FAQ {
     [key: string]: any;
   };
   is_published?: boolean;
+  featured?: boolean;
   created_at?: string;
   updated_at?: string;
 }
@@ -107,6 +108,27 @@ export const searchFAQsByTag = async (tag: string): Promise<FAQ[]> => {
 
   if (error) {
     console.error('Error searching FAQs by tag:', error);
+    return [];
+  }
+
+  return (data || []).map(faq => ({
+    ...faq,
+    competitor_info: faq.competitor_info as FAQ['competitor_info']
+  }));
+};
+
+// Fetch featured FAQs for homepage
+export const fetchFeaturedFAQs = async (): Promise<FAQ[]> => {
+  const { data, error } = await supabase
+    .from('faqs')
+    .select('*')
+    .eq('is_published', true)
+    .eq('featured', true)
+    .order('updated_at', { ascending: false })
+    .limit(9);
+
+  if (error) {
+    console.error('Error fetching featured FAQs:', error);
     return [];
   }
 

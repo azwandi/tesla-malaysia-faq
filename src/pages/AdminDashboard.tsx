@@ -22,6 +22,7 @@ interface FAQ {
   affected_models: string[];
   competitor_info?: any;
   is_published: boolean;
+  featured: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -279,6 +280,29 @@ const AdminDashboard = () => {
         title: "Error",
         description: "Failed to update FAQ status",
         variant: "destructive",
+      });
+    }
+  };
+
+  const handleToggleFeatured = async (faq: FAQ) => {
+    try {
+      const { error } = await supabase
+        .from('faqs')
+        .update({ featured: !faq.featured })
+        .eq('id', faq.id);
+
+      if (error) throw error;
+      toast({ 
+        title: "Success", 
+        description: `FAQ ${!faq.featured ? 'featured' : 'unfeatured'} successfully` 
+      });
+      fetchFAQs();
+    } catch (error) {
+      console.error('Error updating FAQ featured status:', error);
+      toast({ 
+        title: "Error", 
+        description: "Failed to update FAQ featured status",
+        variant: "destructive" 
       });
     }
   };
@@ -707,16 +731,30 @@ const AdminDashboard = () => {
                     <p className="text-sm text-muted-foreground line-clamp-3">
                       {faq.answer.substring(0, 200)}...
                     </p>
-                    <div className="mt-2 flex items-center justify-between">
-                      <Badge variant={faq.is_published ? "default" : "destructive"}>
-                        {faq.is_published ? "Published" : "Draft"}
-                      </Badge>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground">Quick toggle:</span>
-                        <Switch
-                          checked={faq.is_published}
-                          onCheckedChange={() => handleTogglePublished(faq)}
-                        />
+                    <div className="mt-2 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Badge variant={faq.is_published ? "default" : "destructive"}>
+                          {faq.is_published ? "Published" : "Draft"}
+                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground">Published:</span>
+                          <Switch
+                            checked={faq.is_published}
+                            onCheckedChange={() => handleTogglePublished(faq)}
+                          />
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <Badge variant={faq.featured ? "secondary" : "outline"}>
+                          {faq.featured ? "Featured" : "Regular"}
+                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground">Featured:</span>
+                          <Switch
+                            checked={faq.featured}
+                            onCheckedChange={() => handleToggleFeatured(faq)}
+                          />
+                        </div>
                       </div>
                     </div>
                   </CardContent>

@@ -12,16 +12,16 @@ import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
 
 interface FAQ {
-  id: string;
+  id?: string;
   slug: string;
   question: string;
   answer: string;
   tags: string[];
   affected_models: string[];
-  competitor_info?: any;
   is_published: boolean;
-  created_at: string;
-  updated_at: string;
+  featured: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 const FAQEditor = () => {
@@ -94,8 +94,8 @@ const FAQEditor = () => {
         answer: '',
         tags: [],
         affected_models: ['Model 3', 'Model Y'],
-        competitor_info: null,
         is_published: true,
+        featured: false,
         created_at: '',
         updated_at: '',
       });
@@ -158,6 +158,7 @@ const FAQEditor = () => {
             tags: faq.tags,
             affected_models: faq.affected_models,
             is_published: faq.is_published,
+            featured: faq.featured,
           })
           .eq('id', faq.id);
 
@@ -173,6 +174,7 @@ const FAQEditor = () => {
             tags: faq.tags,
             affected_models: faq.affected_models,
             is_published: faq.is_published,
+            featured: faq.featured,
           }]);
 
         if (error) throw error;
@@ -252,14 +254,25 @@ const FAQEditor = () => {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               FAQ Details
-              <div className="flex items-center space-x-2">
-                <Switch
-                  checked={faq.is_published}
-                  onCheckedChange={(checked) => setFaq({ ...faq, is_published: checked })}
-                />
-                <label className="text-sm font-medium">
-                  {faq.is_published ? 'Published' : 'Draft'}
-                </label>
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    checked={faq.is_published}
+                    onCheckedChange={(checked) => setFaq({ ...faq, is_published: checked })}
+                  />
+                  <label className="text-sm font-medium">
+                    {faq.is_published ? 'Published' : 'Draft'}
+                  </label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    checked={faq.featured}
+                    onCheckedChange={(checked) => setFaq({ ...faq, featured: checked })}
+                  />
+                  <label className="text-sm font-medium">
+                    {faq.featured ? 'Featured' : 'Regular'}
+                  </label>
+                </div>
               </div>
             </CardTitle>
           </CardHeader>

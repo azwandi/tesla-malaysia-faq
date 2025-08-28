@@ -9,15 +9,17 @@ import { useState, useEffect } from "react";
 interface FAQListProps {
   faqs?: FAQ[];
   showViewAll?: boolean;
-  fromSearch?: boolean; // Add this prop
-  searchQuery?: string; // Add this prop
+  fromSearch?: boolean;
+  searchQuery?: string;
+  fetchFunction?: () => Promise<FAQ[]>;
 }
 
 export const FAQList = ({ 
   faqs: faqList, 
   showViewAll = true, 
   fromSearch = false, 
-  searchQuery = "" 
+  searchQuery = "",
+  fetchFunction = fetchFAQs
 }: FAQListProps) => {
   const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [loading, setLoading] = useState(true);
@@ -28,13 +30,13 @@ export const FAQList = ({
       setLoading(false);
     } else {
       const loadFAQs = async () => {
-        const data = await fetchFAQs();
+        const data = await fetchFunction();
         setFaqs(data);
         setLoading(false);
       };
       loadFAQs();
     }
-  }, [faqList]);
+  }, [faqList, fetchFunction]);
 
   if (loading) {
     return (

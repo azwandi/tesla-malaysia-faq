@@ -20,6 +20,7 @@ export type Database = {
           answer: string
           competitor_info: Json | null
           created_at: string
+          featured: boolean
           id: string
           is_published: boolean | null
           question: string
@@ -32,6 +33,7 @@ export type Database = {
           answer: string
           competitor_info?: Json | null
           created_at?: string
+          featured?: boolean
           id?: string
           is_published?: boolean | null
           question: string
@@ -44,6 +46,7 @@ export type Database = {
           answer?: string
           competitor_info?: Json | null
           created_at?: string
+          featured?: boolean
           id?: string
           is_published?: boolean | null
           question?: string
