@@ -59,55 +59,76 @@ export const FAQList = ({
       <div className="max-w-7xl mx-auto px-6">
         {showViewAll && (
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Featured Questions</h2>
+            <h2 className="text-4xl font-bold mb-4">Frequently Asked Questions</h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Find answers to the most common questions about owning a Tesla in Malaysia
             </p>
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {displayFaqs.map((faq) => (
-            <Link 
-              key={faq.id}
-              to={`/faq/${faq.slug}`}
-              state={fromSearch ? { 
-                fromSearch: true, 
-                searchQuery: searchQuery 
-              } : undefined}
-              className="block"
+            <Card 
+              key={faq.id} 
+              className="group hover:shadow-md transition-all cursor-pointer bg-card border-border"
             >
-              <Card className="group hover:shadow-lg hover:border-primary/20 transition-all duration-300 cursor-pointer bg-card border-border h-full">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between gap-3 mb-3">
-                    {faq.tags && faq.tags[0] && (
-                      <Badge 
-                        variant="secondary"
-                        className="text-xs font-medium"
-                      >
-                        {faq.tags[0]}
-                      </Badge>
-                    )}
-                    <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all flex-shrink-0" />
+              <Link 
+                to={`/faq/${faq.slug}`}
+                state={fromSearch ? { 
+                  fromSearch: true, 
+                  searchQuery: searchQuery 
+                } : undefined}
+              >
+                <CardHeader className="pb-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1">
+                      <CardTitle className="text-lg mb-2 group-hover:text-primary transition-colors">
+                        {faq.question}
+                      </CardTitle>
+                      <CardDescription className="text-sm line-clamp-3">
+                        {stripMarkdown(faq.answer, 150)}
+                      </CardDescription>
+                    </div>
                   </div>
-                  <CardTitle className="text-base font-semibold group-hover:text-primary transition-colors leading-snug">
-                    {faq.question}
-                  </CardTitle>
                 </CardHeader>
                 
                 <CardContent className="pt-0">
-                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50"></div>
-                      <span>Popular</span>
-                    </div>
-                    {faq.created_at && (
-                      <span>{new Date(faq.created_at).toLocaleDateString()}</span>
+                  {/* Tags */}
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {faq.tags && faq.tags.slice(0, 3).map((tag) => (
+                      <Badge 
+                        key={tag} 
+                        variant="outline"
+                        className="text-xs"
+                      >
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+
+                  {/* Read More Button */}
+                  <div className="flex justify-between items-center">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      className="hover:bg-accent hover:text-accent-foreground transition-colors"
+                    >
+                      Read more
+                      <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                    
+                    {faq.competitor_info && (
+                      <Badge 
+                        variant="secondary"
+                        className="text-xs"
+                      >
+                        Comparison
+                      </Badge>
                     )}
                   </div>
                 </CardContent>
-              </Card>
-            </Link>
+              </Link>
+            </Card>
           ))}
 
           {/* View All Questions Card */}
