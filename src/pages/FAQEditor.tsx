@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Save, ArrowLeft, X } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
+import { AdminHeader } from '@/components/AdminHeader';
 
 interface FAQ {
   id?: string;
@@ -230,23 +231,16 @@ const FAQEditor = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <AdminHeader />
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">
-              {isEditing ? 'Edit FAQ' : 'Create New FAQ'}
-            </h1>
-            <p className="text-muted-foreground">
-              {isEditing ? 'Update the FAQ information below' : 'Fill in the details to create a new FAQ'}
-            </p>
-          </div>
-          <Link to="/admin">
-            <Button variant="outline">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Admin
-            </Button>
-          </Link>
+        {/* Page Title */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-foreground">
+            {isEditing ? 'Edit FAQ' : 'Create New FAQ'}
+          </h1>
+          <p className="text-muted-foreground">
+            {isEditing ? 'Update the FAQ information below' : 'Fill in the details to create a new FAQ'}
+          </p>
         </div>
 
         {/* Editor Form */}

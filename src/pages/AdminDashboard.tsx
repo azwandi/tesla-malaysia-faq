@@ -13,6 +13,7 @@ import { Plus, Edit2, Trash2, LogOut, Upload, FileText, MessageSquare, CheckCirc
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { fetchAllTags } from '@/data/faqs';
+import { AdminHeader } from '@/components/AdminHeader';
 
 interface FAQ {
   id: string;
@@ -55,7 +56,7 @@ const AdminDashboard = () => {
   const [publishedFilter, setPublishedFilter] = useState<'all' | 'published' | 'draft'>('all');
   const [availableTags, setAvailableTags] = useState<string[]>([]);
   
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -258,10 +259,6 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
-  };
 
   const handleTogglePublished = async (faq: FAQ) => {
     try {
@@ -515,61 +512,46 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <AdminHeader />
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">
-              Admin Dashboard
-            </h1>
-            <p className="text-muted-foreground">Manage Tesla Malaysia FAQ content and feedback</p>
-            <p className="text-xs text-muted-foreground/80 mt-1">
-              CSV format: slug, question, answer, tags (semicolon-separated), affected_models (semicolon-separated), is_published (true/false)
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <input
-              type="file"
-              accept=".csv"
-              onChange={handleCSVUpload}
-              className="hidden"
-              id="csv-upload"
-            />
-            <Button
-              onClick={() => document.getElementById('csv-upload')?.click()}
-              variant="outline"
-              disabled={isUploading}
-            >
-              {isUploading ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
-                  Uploading...
-                </>
-              ) : (
-                <>
-                  <Upload className="w-4 h-4 mr-2" />
-                  Upload CSV
-                </>
-              )}
-            </Button>
-            <Link to="/admin/faq/new">
-              <Button variant="default">
-                <Plus className="w-4 h-4 mr-2" />
-                Add FAQ
-              </Button>
-            </Link>
-            <Button 
-              onClick={() => window.open('/', '_blank')} 
-              variant="outline"
-            >
-              <ExternalLink className="w-4 h-4 mr-2" />
-              View Public Page
-            </Button>
-            <Button onClick={handleSignOut} variant="outline">
-              <LogOut className="w-4 h-4 mr-2" />
-              Sign Out
-            </Button>
-          </div>
+        {/* Dashboard Content */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-foreground mb-2">
+            Dashboard
+          </h1>
+          <p className="text-muted-foreground mb-1">Manage Tesla Malaysia FAQ content and feedback</p>
+          <p className="text-xs text-muted-foreground/80">
+            CSV format: slug, question, answer, tags (semicolon-separated), affected_models (semicolon-separated), is_published (true/false)
+          </p>
+        </div>
+
+        {/* Upload CSV */}
+        <div className="mb-6">
+          <input
+            type="file"
+            accept=".csv"
+            onChange={handleCSVUpload}
+            className="hidden"
+            id="csv-upload"
+          />
+          <Button
+            onClick={() => document.getElementById('csv-upload')?.click()}
+            variant="outline"
+            disabled={isUploading}
+            className="mb-4"
+          >
+            {isUploading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
+                Uploading...
+              </>
+            ) : (
+              <>
+                <Upload className="w-4 h-4 mr-2" />
+                Upload CSV
+              </>
+            )}
+          </Button>
         </div>
 
         {/* Main Content Tabs */}
