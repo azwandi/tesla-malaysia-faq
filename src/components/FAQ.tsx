@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Car, Zap } from "lucide-react";
 import { fetchFAQs, type FAQ } from "@/data/faqs";
 import { useState, useEffect } from "react";
+import { stripMarkdown } from "@/lib/utils";
 
 interface FAQListProps {
   faqs?: FAQ[];
@@ -85,7 +86,7 @@ export const FAQList = ({
                         {faq.question}
                       </CardTitle>
                       <CardDescription className="text-sm line-clamp-3">
-                        {faq.answer.substring(0, 150)}...
+                        {stripMarkdown(faq.answer, 150)}
                       </CardDescription>
                     </div>
                   </div>
