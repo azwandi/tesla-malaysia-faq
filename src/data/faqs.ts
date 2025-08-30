@@ -165,6 +165,22 @@ export const fetchFAQsCount = async (): Promise<number> => {
   return count || 0;
 };
 
+// Fetch FAQ count by category
+export const fetchFAQsCountByCategory = async (category: string): Promise<number> => {
+  const { count, error } = await supabase
+    .from('faqs')
+    .select('*', { count: 'exact', head: true })
+    .eq('is_published', true)
+    .eq('category', category);
+
+  if (error) {
+    console.error('Error fetching FAQ count by category:', error);
+    return 0;
+  }
+
+  return count || 0;
+};
+
 export const popularSearchTerms = [
   "charging cost",
   "Model 3 and Model Y",
