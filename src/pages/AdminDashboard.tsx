@@ -513,13 +513,12 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <AdminHeader />
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 pt-24">
         {/* Dashboard Content */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">
             Dashboard
           </h1>
-          <p className="text-muted-foreground mb-1">Manage Tesla Malaysia FAQ content and feedback</p>
           <p className="text-xs text-muted-foreground/80">
             CSV format: slug, question, answer, tags (semicolon-separated), affected_models (semicolon-separated), is_published (true/false)
           </p>

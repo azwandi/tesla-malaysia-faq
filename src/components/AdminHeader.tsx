@@ -17,26 +17,16 @@ export const AdminHeader = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <header className="border-b bg-background">
+    <header className="fixed top-0 left-0 right-0 z-50 border-b bg-background/80 backdrop-blur-md shadow-lg">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center space-x-6">
             <Link to="/admin" className="flex items-center space-x-2">
               <FileText className="h-6 w-6 text-primary" />
-              <span className="text-xl font-semibold">Admin Console</span>
+              <span className="text-xl font-semibold">JomTesla Admin</span>
             </Link>
             
             <nav className="flex items-center space-x-1">
-              <Button
-                variant={isActive('/admin') ? 'default' : 'ghost'}
-                size="sm"
-                asChild
-              >
-                <Link to="/admin">
-                  <Home className="h-4 w-4 mr-2" />
-                  Dashboard
-                </Link>
-              </Button>
               
               <Button
                 variant={isActive('/admin/faq/new') ? 'default' : 'ghost'}
