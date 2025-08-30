@@ -150,6 +150,21 @@ export const faqCategories = [
   "Fun & Extras"
 ];
 
+// Fetch total count of published FAQs
+export const fetchFAQsCount = async (): Promise<number> => {
+  const { count, error } = await supabase
+    .from('faqs')
+    .select('*', { count: 'exact', head: true })
+    .eq('is_published', true);
+
+  if (error) {
+    console.error('Error fetching FAQ count:', error);
+    return 0;
+  }
+
+  return count || 0;
+};
+
 export const popularSearchTerms = [
   "charging cost",
   "Model 3 and Model Y",

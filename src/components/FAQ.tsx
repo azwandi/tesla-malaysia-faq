@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Car, Zap } from "lucide-react";
-import { fetchFAQs, type FAQ } from "@/data/faqs";
+import { fetchFAQs, fetchFAQsCount, type FAQ } from "@/data/faqs";
 import { useState, useEffect } from "react";
 import { stripMarkdown } from "@/lib/utils";
 
@@ -24,6 +24,7 @@ export const FAQList = ({
 }: FAQListProps) => {
   const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [loading, setLoading] = useState(true);
+  const [totalFAQsCount, setTotalFAQsCount] = useState<number>(0);
 
   useEffect(() => {
     if (faqList) {
@@ -37,7 +38,16 @@ export const FAQList = ({
       };
       loadFAQs();
     }
-  }, [faqList, fetchFunction]);
+    
+    // Always fetch total count for "View All Questions" card
+    if (showViewAll) {
+      const loadTotalCount = async () => {
+        const count = await fetchFAQsCount();
+        setTotalFAQsCount(count);
+      };
+      loadTotalCount();
+    }
+  }, [faqList, fetchFunction, showViewAll]);
 
   if (loading) {
     return (
@@ -146,7 +156,7 @@ export const FAQList = ({
                     </p>
                   </div>
                   <Badge variant="secondary" className="bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30">
-                    {faqs.length} questions
+                    {totalFAQsCount} questions
                   </Badge>
                 </CardContent>
               </Link>
