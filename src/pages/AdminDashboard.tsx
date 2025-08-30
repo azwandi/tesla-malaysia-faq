@@ -22,6 +22,7 @@ interface FAQ {
   answer: string;
   tags: string[];
   affected_models: string[];
+  category: string;
   competitor_info?: any;
   is_published: boolean;
   featured: boolean;
@@ -663,12 +664,13 @@ const AdminDashboard = () => {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/50">
-                    <TableHead className="w-[40%]">Question</TableHead>
-                    <TableHead className="w-[20%]">Tags</TableHead>
-                    <TableHead className="w-[20%]">Models</TableHead>
+                    <TableHead className="w-[30%]">Question</TableHead>
+                    <TableHead className="w-[15%]">Category</TableHead>
+                    <TableHead className="w-[15%]">Tags</TableHead>
+                    <TableHead className="w-[15%]">Models</TableHead>
                     <TableHead className="w-[8%] text-center">Published</TableHead>
                     <TableHead className="w-[8%] text-center">Featured</TableHead>
-                    <TableHead className="w-[4%] text-center">Actions</TableHead>
+                    <TableHead className="w-[9%] text-center">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -678,6 +680,11 @@ const AdminDashboard = () => {
                         <div className="max-w-md">
                           <p className="truncate text-sm">{faq.question}</p>
                         </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="default" className="text-xs">
+                          {faq.category}
+                        </Badge>
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1">

@@ -7,6 +7,7 @@ export interface FAQ {
   answer: string;
   tags: string[];
   affected_models: string[];
+  category: string;
   competitor_info?: {
     comparison?: string;
     [key: string]: any;
@@ -137,6 +138,17 @@ export const fetchFeaturedFAQs = async (): Promise<FAQ[]> => {
     competitor_info: faq.competitor_info as FAQ['competitor_info']
   }));
 };
+
+export const faqCategories = [
+  "Buying & Ownership",
+  "Charging & Battery", 
+  "Driving & Features",
+  "Maintenance & Service",
+  "Safety & Security",
+  "Models & Variants",
+  "Costs & Savings",
+  "Fun & Extras"
+];
 
 export const popularSearchTerms = [
   "charging cost",

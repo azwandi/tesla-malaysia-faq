@@ -110,6 +110,16 @@ export default function FAQDetail() {
 
           {/* Tags and Models */}
           <div className="ml-16 space-y-4">
+            {/* Category */}
+            {faq.category && (
+              <div>
+                <h3 className="text-sm font-medium text-muted-foreground mb-2">Category:</h3>
+                <Badge variant="default" className="text-sm">
+                  {faq.category}
+                </Badge>
+              </div>
+            )}
+
             {/* Affected Models */}
             {faq.affected_models && faq.affected_models.length > 0 && (
               <div>

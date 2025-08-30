@@ -10,7 +10,9 @@ import { useToast } from '@/hooks/use-toast';
 import { Save, ArrowLeft, X } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AdminHeader } from '@/components/AdminHeader';
+import { faqCategories } from '@/data/faqs';
 
 interface FAQ {
   id?: string;
@@ -19,6 +21,7 @@ interface FAQ {
   answer: string;
   tags: string[];
   affected_models: string[];
+  category: string;
   is_published: boolean;
   featured: boolean;
   created_at?: string;
@@ -95,6 +98,7 @@ const FAQEditor = () => {
         answer: '',
         tags: [],
         affected_models: ['Model 3', 'Model Y'],
+        category: faqCategories[0], // Default to first category
         is_published: true,
         featured: false,
         created_at: '',
@@ -158,6 +162,7 @@ const FAQEditor = () => {
             answer: faq.answer,
             tags: faq.tags,
             affected_models: faq.affected_models,
+            category: faq.category,
             is_published: faq.is_published,
             featured: faq.featured,
           })
@@ -174,6 +179,7 @@ const FAQEditor = () => {
             answer: faq.answer,
             tags: faq.tags,
             affected_models: faq.affected_models,
+            category: faq.category,
             is_published: faq.is_published,
             featured: faq.featured,
           }]);
@@ -292,6 +298,25 @@ const FAQEditor = () => {
                 placeholder="Enter the FAQ question"
                 className="w-full"
               />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium mb-2 block">Category</label>
+              <Select 
+                value={faq.category} 
+                onValueChange={(value) => setFaq({ ...faq, category: value })}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {faqCategories.map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>

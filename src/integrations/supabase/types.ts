@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           affected_models: string[] | null
           answer: string
+          category: string | null
           competitor_info: Json | null
           created_at: string
           featured: boolean
@@ -31,6 +32,7 @@ export type Database = {
         Insert: {
           affected_models?: string[] | null
           answer: string
+          category?: string | null
           competitor_info?: Json | null
           created_at?: string
           featured?: boolean
@@ -44,6 +46,7 @@ export type Database = {
         Update: {
           affected_models?: string[] | null
           answer?: string
+          category?: string | null
           competitor_info?: Json | null
           created_at?: string
           featured?: boolean
