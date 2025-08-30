@@ -132,7 +132,7 @@ export default function FAQDetail() {
             {/* Tags */}
             {faq.tags && faq.tags.length > 0 && (
               <div>
-                <h3 className="text-sm font-medium text-muted-foreground mb-2">Topics:</h3>
+                <h3 className="text-sm font-medium text-muted-foreground mb-2">Tags:</h3>
                 <div className="flex flex-wrap gap-2">
                   {faq.tags.map((tag) => (
                     <Link 

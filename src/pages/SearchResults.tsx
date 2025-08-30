@@ -126,7 +126,7 @@ export default function SearchResults() {
             <div className="mb-8">
               <div className="flex items-center gap-2 mb-4">
                 <Tag className="w-5 h-5 text-primary" />
-                <h3 className="text-lg font-semibold">Filter by Topic</h3>
+                <h3 className="text-lg font-semibold">Filter by Tags</h3>
               </div>
               <div className="flex flex-wrap gap-2 mb-4">
                 {selectedTag && (

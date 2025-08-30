@@ -622,7 +622,7 @@ const AdminDashboard = () => {
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <Tag className="w-4 h-4 text-primary" />
-                    <span className="text-sm font-medium">Filter by Topic:</span>
+                    <span className="text-sm font-medium">Filter by Tags:</span>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {availableTags.map((tag) => (
