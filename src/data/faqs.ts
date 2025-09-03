@@ -118,6 +118,26 @@ export const searchFAQsByTag = async (tag: string): Promise<FAQ[]> => {
   }));
 };
 
+// Search FAQs by category
+export const searchFAQsByCategory = async (category: string): Promise<FAQ[]> => {
+  const { data, error } = await supabase
+    .from('faqs')
+    .select('*')
+    .eq('is_published', true)
+    .eq('category', category)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error searching FAQs by category:', error);
+    return [];
+  }
+
+  return (data || []).map(faq => ({
+    ...faq,
+    competitor_info: faq.competitor_info as FAQ['competitor_info']
+  }));
+};
+
 // Fetch featured FAQs for homepage
 export const fetchFeaturedFAQs = async (): Promise<FAQ[]> => {
   const { data, error } = await supabase
