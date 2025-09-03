@@ -76,7 +76,7 @@ export const FAQList = ({
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {displayFaqs.map((faq) => (
             <Card 
               key={faq.id} 
@@ -89,43 +89,23 @@ export const FAQList = ({
                   searchQuery: searchQuery 
                 } : undefined}
               >
-                <CardHeader className="pb-4">
+                <CardHeader className="pb-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1">
-                      <CardTitle className="text-lg mb-2 group-hover:text-primary transition-colors">
+                      <CardTitle className="text-base mb-2 group-hover:text-primary transition-colors leading-tight">
                         {faq.question}
                       </CardTitle>
-                      <CardDescription className="text-sm line-clamp-3">
-                        {stripMarkdown(faq.answer, 150)}
+                      <CardDescription className="text-sm line-clamp-2 leading-relaxed">
+                        {stripMarkdown(faq.answer, 120)}
                       </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
                 
                 <CardContent className="pt-0">
-                  {/* Tags */}
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {faq.tags && faq.tags.slice(0, 3).map((tag) => (
-                      <Badge 
-                        key={tag} 
-                        variant="outline"
-                        className="text-xs"
-                      >
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-
-                  {/* Read More Button */}
+                  {/* Read More Arrow */}
                   <div className="flex justify-between items-center">
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      className="hover:bg-accent hover:text-accent-foreground transition-colors"
-                    >
-                      Read more
-                      <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-                    </Button>
+                    <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
                     
                     {faq.competitor_info && (
                       <Badge 
