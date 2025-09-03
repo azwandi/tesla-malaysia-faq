@@ -59,8 +59,21 @@ export default function FAQDetail() {
   const handleBackNavigation = () => {
     // Check if user came from search results page
     if (location.state?.fromSearch) {
-      // Go back to search results with the search query as URL parameter
-      navigate(`/search?q=${encodeURIComponent(location.state.searchQuery)}`);
+      // Reconstruct the search URL with all parameters
+      const params = new URLSearchParams();
+      
+      if (location.state.searchQuery) {
+        params.set('q', location.state.searchQuery);
+      }
+      if (location.state.searchTag) {
+        params.set('tag', location.state.searchTag);
+      }
+      if (location.state.searchCategory) {
+        params.set('category', location.state.searchCategory);
+      }
+      
+      const searchUrl = params.toString() ? `/search?${params.toString()}` : '/search';
+      navigate(searchUrl);
     } else {
       // Go back to homepage
       navigate('/');

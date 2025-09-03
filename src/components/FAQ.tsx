@@ -12,6 +12,8 @@ interface FAQListProps {
   showViewAll?: boolean;
   fromSearch?: boolean;
   searchQuery?: string;
+  searchTag?: string;
+  searchCategory?: string;
   fetchFunction?: () => Promise<FAQ[]>;
 }
 
@@ -20,6 +22,8 @@ export const FAQList = ({
   showViewAll = true, 
   fromSearch = false, 
   searchQuery = "",
+  searchTag = "",
+  searchCategory = "",
   fetchFunction = fetchFAQs
 }: FAQListProps) => {
   const [faqs, setFaqs] = useState<FAQ[]>([]);
@@ -86,7 +90,9 @@ export const FAQList = ({
                 to={`/faq/${faq.slug}`}
                 state={fromSearch ? { 
                   fromSearch: true, 
-                  searchQuery: searchQuery 
+                  searchQuery: searchQuery,
+                  searchTag: searchTag,
+                  searchCategory: searchCategory
                 } : undefined}
               >
                 <CardHeader className="pb-3">

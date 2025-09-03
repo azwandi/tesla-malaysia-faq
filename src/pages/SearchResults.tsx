@@ -253,7 +253,9 @@ export default function SearchResults() {
                   faqs={results} 
                   showViewAll={false} 
                   fromSearch={true}
-                  searchQuery={currentQuery || currentTag || currentCategory}
+                  searchQuery={currentQuery}
+                  searchTag={currentTag}
+                  searchCategory={currentCategory}
                 />
               ) : (
                 <div className="text-center py-16">
