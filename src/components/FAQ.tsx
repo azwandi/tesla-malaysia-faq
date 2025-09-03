@@ -101,22 +101,6 @@ export const FAQList = ({
                     </div>
                   </div>
                 </CardHeader>
-                
-                <CardContent className="pt-0">
-                  {/* Read More Arrow */}
-                  <div className="flex justify-between items-center">
-                    <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                    
-                    {faq.competitor_info && (
-                      <Badge 
-                        variant="secondary"
-                        className="text-xs"
-                      >
-                        Comparison
-                      </Badge>
-                    )}
-                  </div>
-                </CardContent>
               </Link>
             </Card>
           ))}
