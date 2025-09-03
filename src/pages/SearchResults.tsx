@@ -1,11 +1,22 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, Link, useNavigate } from "react-router-dom";
-import { Search, ArrowLeft, AlertCircle, Tag, Folder } from "lucide-react";
+import { Search, ArrowLeft, AlertCircle, Tag, Folder, Car, Zap, Wrench, Shield, Calculator, Sparkles, Settings, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { FAQList } from "@/components/FAQ";
 import { searchFAQs, searchFAQsByTag, searchFAQsByCategory, fetchAllTags, faqCategories, FAQ } from "@/data/faqs";
+
+const categoryIcons = {
+  "Buying & Ownership": Car,
+  "Charging & Battery": Zap,
+  "Driving & Features": Settings,
+  "Maintenance & Service": Wrench,
+  "Safety & Security": Shield,
+  "Models & Variants": Car,
+  "Costs & Savings": DollarSign,
+  "Fun & Extras": Sparkles
+};
 
 export default function SearchResults() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -146,16 +157,22 @@ export default function SearchResults() {
               <h3 className="font-semibold">Categories</h3>
             </div>
             <div className="space-y-2">
-              {faqCategories.map((category) => (
-                <Badge
-                  key={category}
-                  variant={selectedCategory === category ? "default" : "outline"}
-                  className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors text-xs py-1 px-3 w-full justify-start block text-left"
-                  onClick={() => handleCategoryClick(category)}
-                >
-                  {category}
-                </Badge>
-              ))}
+              {faqCategories.map((category) => {
+                const IconComponent = categoryIcons[category as keyof typeof categoryIcons];
+                return (
+                  <Badge
+                    key={category}
+                    variant={selectedCategory === category ? "default" : "outline"}
+                    className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors text-xs py-2 px-3 w-full justify-start block text-left"
+                    onClick={() => handleCategoryClick(category)}
+                  >
+                    <div className="flex items-center gap-2">
+                      <IconComponent className="w-3 h-3" />
+                      {category}
+                    </div>
+                  </Badge>
+                );
+              })}
             </div>
           </div>
 
