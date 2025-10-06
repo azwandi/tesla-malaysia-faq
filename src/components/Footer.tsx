@@ -13,7 +13,7 @@ export const Footer = () => {
           <div className="flex-shrink-0">
             <Button asChild variant="default" size="sm" className="bg-primary hover:bg-primary/90">
               <a 
-                href="https://www.tesla.com/referral/azwandi121931" 
+                href="https://www.tesla.com/en_my/referral/azwandi121931" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2"
