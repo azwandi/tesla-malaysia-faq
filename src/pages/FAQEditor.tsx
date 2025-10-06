@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useNavigate, useParams, Link, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,6 +31,7 @@ interface FAQ {
 const FAQEditor = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
   const [faq, setFaq] = useState<FAQ | null>(null);
@@ -190,7 +191,14 @@ const FAQEditor = () => {
 
       // Clear localStorage after successful save
       localStorage.removeItem(storageKey);
-      navigate('/admin');
+      
+      // Navigate back with search filters if they were provided
+      const adminState = location.state as { searchQuery?: string; selectedTag?: string; publishedFilter?: string } | undefined;
+      if (adminState?.searchQuery || adminState?.selectedTag || adminState?.publishedFilter) {
+        navigate('/admin', { state: adminState });
+      } else {
+        navigate('/admin');
+      }
     } catch (error) {
       toast({
         title: "Error",

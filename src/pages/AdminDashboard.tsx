@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
@@ -60,12 +60,24 @@ const AdminDashboard = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (!user) {
       navigate('/admin/login');
       return;
     }
+    
+    // Restore search filters from navigation state if available
+    const adminState = location.state as { searchQuery?: string; selectedTag?: string; publishedFilter?: string } | undefined;
+    if (adminState) {
+      if (adminState.searchQuery) setSearchQuery(adminState.searchQuery);
+      if (adminState.selectedTag) setSelectedTag(adminState.selectedTag);
+      if (adminState.publishedFilter) setPublishedFilter(adminState.publishedFilter as 'all' | 'published' | 'draft');
+      // Clear the state after restoring
+      window.history.replaceState({}, document.title);
+    }
+    
     fetchFAQs();
     fetchFeedback();
     loadTags();
@@ -728,7 +740,14 @@ const AdminDashboard = () => {
                           >
                             <ExternalLink className="w-4 h-4" />
                           </Button>
-                          <Link to={`/admin/faq/edit/${faq.slug}`}>
+                          <Link 
+                            to={`/admin/faq/edit/${faq.slug}`}
+                            state={{
+                              searchQuery,
+                              selectedTag,
+                              publishedFilter
+                            }}
+                          >
                             <Button
                               variant="ghost"
                               size="sm"
