@@ -22,7 +22,7 @@ export const SearchHero = () => {
       {/* Background Image */}
       <div className="absolute inset-0">
         <img src={teslaMalaysiaBg} alt="Tesla in Malaysia" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/50"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70"></div>
       </div>
       
       <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
@@ -34,9 +34,9 @@ export const SearchHero = () => {
         {/* Hero Title */}
         <div className="mb-12">
           <div className="flex items-center justify-center gap-3 mb-8">
-            <h1 className="text-5xl md:text-6xl font-bold text-white">Buying a Tesla? Got questions?</h1>
+            <h1 className="text-5xl md:text-6xl font-bold text-white drop-shadow-lg">Buying a Tesla? Got questions?</h1>
           </div>
-          <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto">
+          <p className="text-lg md:text-xl text-white max-w-3xl mx-auto drop-shadow-md">
             We've got the answers. Curated for Malaysians, by Malaysians 🇲🇾 
           </p>
         </div>
@@ -56,9 +56,9 @@ export const SearchHero = () => {
 
         {/* Popular Search Terms */}
         <div className="max-w-3xl mx-auto">
-          <p className="text-white/80 mb-4 text-sm">Popular searches:</p>
+          <p className="text-white mb-4 text-sm drop-shadow-md">Popular searches:</p>
           <div className="flex flex-wrap justify-center gap-2">
-            {popularSearchTerms.map(term => <Button key={term} variant="outline" size="sm" onClick={() => handleSearch(term)} className="border-white/30 text-white hover:bg-white/20 hover:text-white bg-black/20 backdrop-blur-sm">
+            {popularSearchTerms.map(term => <Button key={term} variant="outline" size="sm" onClick={() => handleSearch(term)} className="border-white/40 text-white hover:bg-white/30 hover:text-white bg-black/30 backdrop-blur-sm">
                 {term}
               </Button>)}
           </div>
