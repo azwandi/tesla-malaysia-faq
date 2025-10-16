@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { popularSearchTerms } from "@/data/faqs";
 import teslaSketch from '@/assets/tesla-sketch.png';
+import teslaMalaysiaBg from '@/assets/tesla-malaysia-bg.jpg';
 
 export const SearchHero = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -22,9 +23,16 @@ export const SearchHero = () => {
   };
   
   return (
-    <section className="relative min-h-[80vh] sm:min-h-[60vh] flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-100 to-indigo-200 overflow-hidden py-20 sm:py-32">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-blue-500/5"></div>
+    <section className="relative min-h-[80vh] sm:min-h-[60vh] flex items-center justify-center overflow-hidden py-20 sm:py-32">
+      {/* Background Image */}
+      <div className="absolute inset-0">
+        <img 
+          src={teslaMalaysiaBg} 
+          alt="Tesla in Malaysia" 
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/50"></div>
+      </div>
       
       <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
         {/* Tesla Sketch Image - Above Headline */}
@@ -39,9 +47,9 @@ export const SearchHero = () => {
         {/* Hero Title */}
         <div className="mb-12">
           <div className="flex items-center justify-center gap-3 mb-8">
-            <h1 className="text-5xl md:text-6xl font-bold text-foreground">Buying a Tesla? Got questions?</h1>
+            <h1 className="text-5xl md:text-6xl font-bold text-white">Buying a Tesla? Got questions?</h1>
           </div>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto">
             We've got the answers. Curated for Malaysians, by Malaysians 🇲🇾 
           </p>
         </div>
@@ -67,7 +75,7 @@ export const SearchHero = () => {
 
         {/* Popular Search Terms */}
         <div className="max-w-3xl mx-auto">
-          <p className="text-muted-foreground mb-4 text-sm">Popular searches:</p>
+          <p className="text-white/80 mb-4 text-sm">Popular searches:</p>
           <div className="flex flex-wrap justify-center gap-2">
             {popularSearchTerms.map(term => (
               <Button 
@@ -75,7 +83,7 @@ export const SearchHero = () => {
                 variant="outline" 
                 size="sm" 
                 onClick={() => handleSearch(term)} 
-                className="border-border text-foreground hover:bg-accent hover:text-accent-foreground"
+                className="border-white/30 text-white hover:bg-white/20 hover:text-white bg-black/20 backdrop-blur-sm"
               >
                 {term}
               </Button>
