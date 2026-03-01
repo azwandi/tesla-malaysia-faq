@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Plus, Edit2, Trash2, LogOut, Upload, FileText, MessageSquare, CheckCircle, ExternalLink, Search, Tag, Filter, X, Car } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { fetchAllTags } from '@/data/faqs';
 import { AdminHeader } from '@/components/AdminHeader';
 
@@ -50,7 +51,12 @@ const AdminDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isFeedbackLoading, setIsFeedbackLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
-  
+  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; type: 'faq' | 'feedback'; id: string | null }>({
+    open: false,
+    type: 'faq',
+    id: null,
+  });
+
   // Filter states
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
@@ -204,9 +210,17 @@ const AdminDashboard = () => {
     }
   };
 
-  const deleteFeedback = async (feedbackId: string) => {
-    if (!window.confirm('Are you sure you want to delete this feedback?')) return;
+  const confirmDelete = () => {
+    if (!deleteDialog.id) return;
+    if (deleteDialog.type === 'faq') {
+      handleDeleteFAQ(deleteDialog.id);
+    } else {
+      deleteFeedback(deleteDialog.id);
+    }
+    setDeleteDialog({ open: false, type: 'faq', id: null });
+  };
 
+  const deleteFeedback = async (feedbackId: string) => {
     try {
       const { error } = await supabase
         .from('feedback')
@@ -252,8 +266,6 @@ const AdminDashboard = () => {
 
 
   const handleDeleteFAQ = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this FAQ?')) return;
-
     try {
       const { error } = await supabase
         .from('faqs')
@@ -757,7 +769,7 @@ const AdminDashboard = () => {
                             </Button>
                           </Link>
                           <Button
-                            onClick={() => handleDeleteFAQ(faq.id)}
+                            onClick={() => setDeleteDialog({ open: true, type: 'faq', id: faq.id })}
                             variant="ghost"
                             size="sm"
                             className="text-destructive hover:text-destructive hover:bg-destructive/10"
@@ -835,7 +847,7 @@ const AdminDashboard = () => {
                           </Button>
                         )}
                         <Button
-                          onClick={() => deleteFeedback(fb.id)}
+                          onClick={() => setDeleteDialog({ open: true, type: 'feedback', id: fb.id })}
                           variant="outline"
                           size="sm"
                           className="text-destructive hover:text-destructive"
@@ -864,6 +876,23 @@ const AdminDashboard = () => {
         </Tabs>
 
       </div>
+
+      <AlertDialog open={deleteDialog.open} onOpenChange={(open) => setDeleteDialog(d => ({ ...d, open }))}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the {deleteDialog.type === 'faq' ? 'FAQ' : 'feedback'}. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
