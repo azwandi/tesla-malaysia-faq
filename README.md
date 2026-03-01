@@ -2,6 +2,8 @@
 
 A community-driven FAQ platform for Tesla owners and prospective buyers in Malaysia. Covers topics like charging costs, government incentives, maintenance comparisons, Autopilot legality, and more — all tailored to local conditions.
 
+**Live site: [jomtesla.my](https://jomtesla.my)**
+
 ## Features
 
 - **Search** — Full-text search across questions and answers
@@ -27,6 +29,24 @@ A community-driven FAQ platform for Tesla owners and prospective buyers in Malay
 ### Prerequisites
 
 - Node.js 18+ and npm
+- A [Supabase](https://supabase.com) project
+
+### Environment Variables
+
+Copy `.env.example` to `.env` and fill in your Supabase credentials:
+
+```sh
+cp .env.example .env
+```
+
+| Variable | Description |
+|---|---|
+| `VITE_SUPABASE_URL` | Your Supabase project URL |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Your Supabase `anon` public key |
+
+Both values are found in your Supabase project under **Settings → API**.
+
+> **Never commit `.env` to version control.** It is listed in `.gitignore`.
 
 ### Local Development
 
