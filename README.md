@@ -43,6 +43,7 @@ cp .env.example .env
 |---|---|
 | `VITE_SUPABASE_URL` | Your Supabase project URL |
 | `VITE_SUPABASE_PUBLISHABLE_KEY` | Your Supabase `anon` public key |
+| `VITE_SUPABASE_PROJECT_ID` | Your Supabase project ID |
 
 Both values are found in your Supabase project under **Settings → API**.
 
