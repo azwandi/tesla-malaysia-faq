@@ -1,73 +1,124 @@
-# Welcome to your Lovable project
+# Tesla Malaysia FAQ
 
-## Project info
+A community-driven FAQ platform for Tesla owners and prospective buyers in Malaysia. Covers topics like charging costs, government incentives, maintenance comparisons, Autopilot legality, and more — all tailored to local conditions.
 
-**URL**: https://lovable.dev/projects/5a370ee8-50e1-49a8-a368-dc0a1ca55ebe
+## Features
 
-## How can I edit this code?
+- **Search** — Full-text search across questions and answers
+- **Categories** — Browse by topic: Charging & Battery, Costs & Savings, Maintenance, Safety, Models & Variants, etc.
+- **Tags** — Filter FAQs by tag or affected Tesla model
+- **FAQ detail pages** — Individual pages with user feedback forms
+- **Admin dashboard** — Manage FAQs with publish/draft/featured toggles, tag filters, and bulk CSV import
+- **Supabase backend** — Row-level security with public read access and authenticated write access
 
-There are several ways of editing your application.
+## Tech Stack
 
-**Use Lovable**
+| Layer | Technology |
+|---|---|
+| Frontend | React 18, TypeScript, Vite |
+| Styling | Tailwind CSS, shadcn/ui |
+| Routing | React Router v6 |
+| Data fetching | TanStack Query v5 |
+| Backend | Supabase (PostgreSQL + Auth) |
+| Markdown | react-markdown, remark-gfm |
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/5a370ee8-50e1-49a8-a368-dc0a1ca55ebe) and start prompting.
+## Getting Started
 
-Changes made via Lovable will be committed automatically to this repo.
+### Prerequisites
 
-**Use your preferred IDE**
+- Node.js 18+ and npm
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+### Local Development
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
+# Clone the repository
 git clone <YOUR_GIT_URL>
+cd tesla-malaysia-faq
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Install dependencies
+npm install
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The app will be available at `http://localhost:8080`.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Build for Production
 
-**Use GitHub Codespaces**
+```sh
+npm run build
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Preview the production build locally:
 
-## What technologies are used for this project?
+```sh
+npm run preview
+```
 
-This project is built with:
+## Project Structure
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+```
+src/
+├── components/       # Shared UI components (SearchHero, FAQ, CategoriesSection, etc.)
+├── pages/            # Route-level components
+│   ├── Index.tsx         # Homepage
+│   ├── FAQDetail.tsx     # Individual FAQ page
+│   ├── SearchResults.tsx # Search results
+│   ├── AdminLogin.tsx    # Admin login
+│   ├── AdminDashboard.tsx # FAQ management
+│   └── FAQEditor.tsx     # Create/edit FAQ
+├── data/
+│   └── faqs.ts       # Supabase query functions and FAQ categories
+├── hooks/            # Custom React hooks (useAuth, etc.)
+├── integrations/
+│   └── supabase/     # Auto-generated Supabase client and types
+└── lib/              # Utility functions
+```
 
-## How can I deploy this project?
+## Database Schema
 
-Simply open [Lovable](https://lovable.dev/projects/5a370ee8-50e1-49a8-a368-dc0a1ca55ebe) and click on Share -> Publish.
+The main `faqs` table in Supabase:
 
-## Can I connect a custom domain to my Lovable project?
+| Column | Type | Description |
+|---|---|---|
+| `id` | UUID | Primary key |
+| `slug` | TEXT | URL-friendly identifier (unique) |
+| `question` | TEXT | FAQ question |
+| `answer` | TEXT | Markdown-formatted answer |
+| `tags` | TEXT[] | Searchable tags |
+| `affected_models` | TEXT[] | Relevant Tesla models |
+| `category` | TEXT | One of 8 predefined categories |
+| `competitor_info` | JSONB | Optional comparison data |
+| `is_published` | BOOLEAN | Visibility on public site |
+| `featured` | BOOLEAN | Shown on homepage |
+| `created_at` | TIMESTAMPTZ | Auto-set on insert |
+| `updated_at` | TIMESTAMPTZ | Auto-updated on change |
 
-Yes, you can!
+Row-level security is enabled: public users can read published FAQs, authenticated users can create, update, and delete.
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## Admin Panel
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Access the admin dashboard at `/admin/login`. Requires a Supabase authenticated account.
+
+Features:
+- Filter FAQs by search query, tag, or publish status
+- Toggle published/featured status per FAQ
+- Create and edit FAQs with a rich form editor
+- **Bulk CSV import** — Upload a `.csv` file with columns: `slug`, `question`, `answer`, `tags` (semicolon-separated), `affected_models` (semicolon-separated), `is_published` (`true`/`false`)
+- Review and resolve user feedback submissions
+
+## FAQ Categories
+
+- Buying & Ownership
+- Charging & Battery
+- Driving & Features
+- Maintenance & Service
+- Safety & Security
+- Models & Variants
+- Costs & Savings
+- Fun & Extras
+
+## Contributing
+
+Content contributions are welcome. To add or update FAQs, either use the admin dashboard or submit a pull request modifying the seed data in `supabase/migrations/`.
