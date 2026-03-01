@@ -81,9 +81,22 @@ export default function FAQDetail() {
     }
   };
 
-  const description = faq.answer.replace(/[#*`]/g, '').slice(0, 155).trim() + '…';
+  const plainAnswer = faq.answer.replace(/[#*`]/g, '');
+  const description = plainAnswer.slice(0, 155).trim() + '…';
   const pageTitle = `${faq.question} | JomTesla`;
   const pageUrl = `https://jomtesla.my/faq/${faq.slug}`;
+  const jsonLd = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [{
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: plainAnswer,
+      },
+    }],
+  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -97,6 +110,7 @@ export default function FAQDetail() {
         <meta property="og:url" content={pageUrl} />
         <meta name="twitter:title" content={pageTitle} />
         <meta name="twitter:description" content={description} />
+        <script type="application/ld+json">{jsonLd}</script>
       </Helmet>
 
       {/* Navigation */}
