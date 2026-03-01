@@ -98,6 +98,50 @@ export const fetchAllTags = async (): Promise<string[]> => {
   return [...new Set(allTags)].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
 };
 
+// Fetch related FAQs by shared tags or same category, excluding current FAQ
+export const fetchRelatedFAQs = async (currentSlug: string, tags: string[], category: string): Promise<FAQ[]> => {
+  const results: FAQ[] = [];
+  const seen = new Set<string>();
+
+  // Try to find FAQs sharing at least one tag
+  if (tags.length > 0) {
+    const { data } = await supabase
+      .from('faqs')
+      .select('*')
+      .eq('is_published', true)
+      .neq('slug', currentSlug)
+      .overlaps('tags', tags)
+      .limit(4);
+
+    for (const faq of data || []) {
+      if (!seen.has(faq.id)) {
+        seen.add(faq.id);
+        results.push({ ...faq, competitor_info: faq.competitor_info as FAQ['competitor_info'] });
+      }
+    }
+  }
+
+  // Top up from same category if we have fewer than 4
+  if (results.length < 4 && category) {
+    const { data } = await supabase
+      .from('faqs')
+      .select('*')
+      .eq('is_published', true)
+      .neq('slug', currentSlug)
+      .eq('category', category)
+      .limit(4 - results.length);
+
+    for (const faq of data || []) {
+      if (!seen.has(faq.id)) {
+        seen.add(faq.id);
+        results.push({ ...faq, competitor_info: faq.competitor_info as FAQ['competitor_info'] });
+      }
+    }
+  }
+
+  return results.slice(0, 4);
+};
+
 // Search FAQs by tag
 export const searchFAQsByTag = async (tag: string): Promise<FAQ[]> => {
   const { data, error } = await supabase

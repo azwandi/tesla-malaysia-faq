@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { getFAQBySlug, FAQ } from "@/data/faqs";
+import { getFAQBySlug, fetchRelatedFAQs, FAQ } from "@/data/faqs";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { FeedbackForm } from "@/components/FeedbackForm";
@@ -18,13 +18,18 @@ export default function FAQDetail() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [faq, setFaq] = useState<FAQ | null>(null);
+  const [relatedFAQs, setRelatedFAQs] = useState<FAQ[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   useEffect(() => {
     const loadFAQ = async () => {
       if (slug) {
         const data = await getFAQBySlug(slug);
         setFaq(data);
+        if (data) {
+          const related = await fetchRelatedFAQs(slug, data.tags, data.category);
+          setRelatedFAQs(related);
+        }
       }
       setLoading(false);
     };
@@ -282,6 +287,27 @@ export default function FAQDetail() {
             <FeedbackForm faqId={faq.id} />
           </div>
         </div>
+
+        {/* Related FAQs */}
+        {relatedFAQs.length > 0 && (
+          <div className="mt-12 pt-8 border-t border-border">
+            <h3 className="text-lg font-semibold mb-4">Related Questions</h3>
+            <div className="space-y-3">
+              {relatedFAQs.map((related) => (
+                <Link
+                  key={related.slug}
+                  to={`/faq/${related.slug}`}
+                  className="block p-4 rounded-lg border border-border hover:bg-accent transition-colors"
+                >
+                  <p className="font-medium text-sm leading-snug">{related.question}</p>
+                  {related.category && (
+                    <span className="text-xs text-muted-foreground mt-1 inline-block">{related.category}</span>
+                  )}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Navigation */}
         <div className="mt-8 pt-8 border-t border-border">
