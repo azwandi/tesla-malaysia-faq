@@ -1,5 +1,6 @@
 import { useParams, Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { ArrowLeft, Car, Tag, Lightbulb, Zap, Settings } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -80,8 +81,24 @@ export default function FAQDetail() {
     }
   };
 
+  const description = faq.answer.replace(/[#*`]/g, '').slice(0, 155).trim() + '…';
+  const pageTitle = `${faq.question} | JomTesla`;
+  const pageUrl = `https://jomtesla.my/faq/${faq.slug}`;
+
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={description} />
+        <link rel="canonical" href={pageUrl} />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={description} />
+        <meta property="og:url" content={pageUrl} />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={description} />
+      </Helmet>
+
       {/* Navigation */}
       <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
         <div className="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
