@@ -121,6 +121,8 @@ Row-level security is enabled: public users can read published FAQs, authenticat
 
 Access the admin dashboard at `/admin/login`. Requires a Supabase authenticated account.
 
+To create admin credentials, go to your Supabase project → **Authentication → Users → Add user**. Enter an email and password — these are what you'll use to log in at `/admin/login`. There is no self-registration; accounts must be created manually through the Supabase dashboard.
+
 Features:
 - Filter FAQs by search query, tag, or publish status
 - Toggle published/featured status per FAQ
