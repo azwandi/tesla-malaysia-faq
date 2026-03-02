@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Zap } from "lucide-react";
+import { Search, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { popularSearchTerms } from "@/data/faqs";
+import { REFERRAL_URL, REFERRAL_DISCOUNT } from "@/lib/referral";
 import teslaSketch from '@/assets/tesla-sketch.png';
 import teslaMalaysiaBg from '@/assets/tesla-malaysia-bg.jpg';
 export const SearchHero = () => {
@@ -62,6 +63,19 @@ export const SearchHero = () => {
                 {term}
               </Button>)}
           </div>
+        </div>
+
+        {/* Referral Nudge */}
+        <div className="mt-8">
+          <a
+            href={REFERRAL_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/30 text-white px-5 py-2.5 rounded-full text-sm font-medium transition-colors"
+          >
+            <span>Already decided? Get <strong>{REFERRAL_DISCOUNT} off</strong> with my referral link</span>
+            <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
+          </a>
         </div>
       </div>
     </section>;

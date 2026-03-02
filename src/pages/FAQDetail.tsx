@@ -11,6 +11,7 @@ import { getFAQBySlug, fetchRelatedFAQs, FAQ } from "@/data/faqs";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { FeedbackForm } from "@/components/FeedbackForm";
+import { REFERRAL_URL, REFERRAL_DISCOUNT, PURCHASE_INTENT_CATEGORIES, PURCHASE_INTENT_TAGS } from "@/lib/referral";
 
 export default function FAQDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -85,6 +86,10 @@ export default function FAQDetail() {
       navigate('/');
     }
   };
+
+  const isHighIntent =
+    PURCHASE_INTENT_CATEGORIES.includes(faq.category) ||
+    faq.tags.some(t => PURCHASE_INTENT_TAGS.includes(t));
 
   const plainAnswer = faq.answer.replace(/[#*`]/g, '');
   const description = plainAnswer.slice(0, 155).trim() + '…';
@@ -275,6 +280,37 @@ export default function FAQDetail() {
               ))}
             </CardContent>
           </Card>
+        )}
+
+        {/* Referral CTA */}
+        {isHighIntent ? (
+          <div className="mt-10 rounded-xl border border-primary/30 bg-primary/5 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <p className="font-semibold text-foreground mb-1">Ready to order your Tesla?</p>
+              <p className="text-sm text-muted-foreground">Use my referral link and get <span className="font-semibold text-foreground">{REFERRAL_DISCOUNT} off</span> your purchase — and help keep this site running.</p>
+            </div>
+            <a
+              href={REFERRAL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-shrink-0 inline-flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors px-5 py-2.5 rounded-lg text-sm font-semibold"
+            >
+              Order with Referral
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          </div>
+        ) : (
+          <div className="mt-10 flex items-center justify-between gap-4 rounded-lg border border-border bg-muted/30 px-5 py-3">
+            <p className="text-sm text-muted-foreground">Thinking of buying a Tesla? Get <span className="font-medium text-foreground">{REFERRAL_DISCOUNT} off</span> with my referral link.</p>
+            <a
+              href={REFERRAL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-shrink-0 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+            >
+              Claim discount <ExternalLink className="w-3 h-3" />
+            </a>
+          </div>
         )}
 
         {/* Feedback Section */}
