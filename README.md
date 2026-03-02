@@ -141,4 +141,4 @@ Features:
 
 ## Contributing
 
-Content contributions are welcome. To add or update FAQs, either use the admin dashboard or submit a pull request modifying the seed data in `supabase/migrations/`.
+Content contributions are welcome. To suggest a new FAQ or report incorrect information, [open a GitHub issue](https://github.com/azwandi/tesla-malaysia-faq/issues/new) with your question and any relevant details.
