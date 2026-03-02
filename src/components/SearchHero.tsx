@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,20 @@ import teslaMalaysiaHero from '@/assets/tesla-malaysia-hero.jpg';
 
 export const SearchHero = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [placeholderIndex, setPlaceholderIndex] = useState(0);
+  const [placeholderVisible, setPlaceholderVisible] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPlaceholderVisible(false);
+      setTimeout(() => {
+        setPlaceholderIndex(i => (i + 1) % popularSearchTerms.length);
+        setPlaceholderVisible(true);
+      }, 300);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleSearch = (query: string) => {
     if (query.trim()) {
@@ -49,18 +62,18 @@ export const SearchHero = () => {
           {/* Search Bar */}
           <form onSubmit={handleSubmit} className="mb-6">
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
               <Input
                 type="text"
-                placeholder="Ask anything about Tesla in Malaysia..."
+                placeholder={popularSearchTerms[placeholderIndex]}
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="pl-12 pr-28 py-6 text-base bg-white border-gray-200 focus-visible:ring-2 rounded-xl"
+                className={`pl-14 pr-32 py-8 text-lg bg-white border-gray-200 focus-visible:ring-2 rounded-xl transition-opacity duration-300 ${placeholderVisible ? 'placeholder:opacity-100' : 'placeholder:opacity-0'}`}
               />
               <Button
                 type="submit"
                 size="lg"
-                className="absolute right-2 top-1/2 -translate-y-1/2 px-5 rounded-lg"
+                className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-6 rounded-lg text-base"
               >
                 Search
               </Button>
