@@ -1,7 +1,7 @@
 import { useParams, Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
-import { ArrowLeft, Car, Tag, Lightbulb, Zap, Settings } from "lucide-react";
+import { ArrowLeft, Car, Tag, Lightbulb, Zap, Settings, ExternalLink } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
