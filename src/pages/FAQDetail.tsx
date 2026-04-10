@@ -240,19 +240,37 @@ export default function FAQDetail() {
                   h1: ({children}) => <h1 className="text-2xl font-bold text-foreground mb-4">{children}</h1>,
                   h2: ({children}) => <h2 className="text-xl font-bold text-foreground mb-3">{children}</h2>,
                   h3: ({children}) => <h3 className="text-lg font-bold text-foreground mb-2">{children}</h3>,
-                  ul: ({children}) => <ul className="list-disc list-inside mb-4 space-y-1">{children}</ul>,
-                  ol: ({children}) => <ol className="list-decimal list-inside mb-4 space-y-1">{children}</ol>,
-                  li: ({children}) => <li className="text-foreground">{children}</li>,
+                  ul: ({children}) => <ul className="list-disc list-outside pl-6 mb-4 space-y-1.5">{children}</ul>,
+                  ol: ({children}) => <ol className="list-decimal list-outside pl-6 mb-4 space-y-1.5">{children}</ol>,
+                  li: ({children}) => <li className="text-foreground leading-relaxed">{children}</li>,
                   blockquote: ({children}) => <blockquote className="border-l-4 border-primary pl-4 italic text-foreground/80 mb-4">{children}</blockquote>,
                   a: ({href, children}) => (
-                    <a 
-                      href={href} 
-                      target="_blank" 
+                    <a
+                      href={href}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="text-primary hover:text-primary/80 underline underline-offset-2 hover:underline-offset-4 transition-all duration-200"
                     >
                       {children}
                     </a>
+                  ),
+                  table: ({children}) => (
+                    <div className="overflow-x-auto my-6 rounded-lg border border-border">
+                      <table className="w-full text-sm border-collapse">{children}</table>
+                    </div>
+                  ),
+                  thead: ({children}) => <thead className="bg-muted/60">{children}</thead>,
+                  tbody: ({children}) => <tbody className="divide-y divide-border">{children}</tbody>,
+                  tr: ({children}) => <tr className="hover:bg-muted/30 transition-colors">{children}</tr>,
+                  th: ({children}) => (
+                    <th className="px-4 py-3 text-left font-semibold text-foreground text-sm border-b border-border">
+                      {children}
+                    </th>
+                  ),
+                  td: ({children}) => (
+                    <td className="px-4 py-3 text-foreground/90 align-top">
+                      {children}
+                    </td>
                   ),
                 }}
               >
