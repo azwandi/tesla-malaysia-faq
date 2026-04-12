@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useSearchParams, Link, useNavigate } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import { Search, ArrowLeft, AlertCircle, Tag, Folder, Car, Zap, Wrench, Shield, Sparkles, Settings, DollarSign, SlidersHorizontal, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,116 @@ const categoryIcons = {
   "Fun & Extras": Sparkles
 };
 
+interface SidebarProps {
+  searchQuery: string;
+  onSearchQueryChange: (value: string) => void;
+  onSearchSubmit: (e: React.FormEvent) => void;
+  hasFilter: boolean;
+  selectedCategory: string | null;
+  selectedTag: string | null;
+  tags: string[];
+  onCategoryClick: (category: string) => void;
+  onTagClick: (tag: string) => void;
+  onClearFilters: () => void;
+}
+
+function Sidebar({
+  searchQuery,
+  onSearchQueryChange,
+  onSearchSubmit,
+  hasFilter,
+  selectedCategory,
+  selectedTag,
+  tags,
+  onCategoryClick,
+  onTagClick,
+  onClearFilters,
+}: SidebarProps) {
+  return (
+    <div className="flex flex-col gap-8">
+      {/* Search */}
+      <form onSubmit={onSearchSubmit}>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search questions..."
+            value={searchQuery}
+            onChange={(e) => onSearchQueryChange(e.target.value)}
+            className="pl-9 pr-20 bg-background text-sm"
+          />
+          <Button type="submit" size="sm" className="absolute right-1 top-1/2 -translate-y-1/2 h-7 text-xs px-3">
+            Go
+          </Button>
+        </div>
+      </form>
+
+      {/* Clear filters */}
+      {hasFilter && (
+        <button
+          onClick={onClearFilters}
+          className="flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+        >
+          <X className="w-3.5 h-3.5" /> Clear filters
+        </button>
+      )}
+
+      {/* Categories */}
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <Folder className="w-3.5 h-3.5 text-muted-foreground" />
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Categories</h3>
+        </div>
+        <div className="space-y-0.5">
+          {faqCategories.map((category) => {
+            const IconComponent = categoryIcons[category as keyof typeof categoryIcons];
+            const isSelected = selectedCategory === category;
+            return (
+              <button
+                key={category}
+                onClick={() => onCategoryClick(category)}
+                className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-base transition-colors text-left ${
+                  isSelected
+                    ? 'bg-primary text-primary-foreground font-medium'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                }`}
+              >
+                <IconComponent className="w-3.5 h-3.5 flex-shrink-0" />
+                {category}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Tags */}
+      {tags.length > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <Tag className="w-3.5 h-3.5 text-muted-foreground" />
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tags</h3>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {tags.map((tag) => (
+              <button
+                key={tag}
+                onClick={() => onTagClick(tag)}
+                className={`text-sm px-2.5 py-1 rounded-full transition-colors ${
+                  selectedTag === tag
+                    ? 'bg-primary text-primary-foreground font-medium'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/70 hover:text-foreground'
+                }`}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function SearchResults() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
@@ -26,7 +136,6 @@ export default function SearchResults() {
   const [selectedTag, setSelectedTag] = useState<string | null>(searchParams.get("tag") || null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(searchParams.get("category") || null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
@@ -81,89 +190,18 @@ export default function SearchResults() {
   const currentCategory = searchParams.get("category") || "";
   const hasFilter = !!(currentCategory || currentTag);
 
-  const Sidebar = () => (
-    <div className="flex flex-col gap-8">
-      {/* Search */}
-      <form onSubmit={handleSearch}>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            type="text"
-            placeholder="Search questions..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 pr-20 bg-background text-sm"
-          />
-          <Button type="submit" size="sm" className="absolute right-1 top-1/2 -translate-y-1/2 h-7 text-xs px-3">
-            Go
-          </Button>
-        </div>
-      </form>
-
-      {/* Clear filters */}
-      {hasFilter && (
-        <button
-          onClick={clearFilters}
-          className="flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
-        >
-          <X className="w-3.5 h-3.5" /> Clear filters
-        </button>
-      )}
-
-      {/* Categories */}
-      <div>
-        <div className="flex items-center gap-2 mb-3">
-          <Folder className="w-3.5 h-3.5 text-muted-foreground" />
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Categories</h3>
-        </div>
-        <div className="space-y-0.5">
-          {faqCategories.map((category) => {
-            const IconComponent = categoryIcons[category as keyof typeof categoryIcons];
-            const isSelected = selectedCategory === category;
-            return (
-              <button
-                key={category}
-                onClick={() => handleCategoryClick(category)}
-                className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-base transition-colors text-left ${
-                  isSelected
-                    ? 'bg-primary text-primary-foreground font-medium'
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                }`}
-              >
-                <IconComponent className="w-3.5 h-3.5 flex-shrink-0" />
-                {category}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Tags */}
-      {tags.length > 0 && (
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <Tag className="w-3.5 h-3.5 text-muted-foreground" />
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tags</h3>
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            {tags.map((tag) => (
-              <button
-                key={tag}
-                onClick={() => handleTagClick(tag)}
-                className={`text-sm px-2.5 py-1 rounded-full transition-colors ${
-                  selectedTag === tag
-                    ? 'bg-primary text-primary-foreground font-medium'
-                    : 'bg-muted text-muted-foreground hover:bg-muted/70 hover:text-foreground'
-                }`}
-              >
-                {tag}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
+  const sidebarProps: SidebarProps = {
+    searchQuery,
+    onSearchQueryChange: setSearchQuery,
+    onSearchSubmit: handleSearch,
+    hasFilter,
+    selectedCategory,
+    selectedTag,
+    tags,
+    onCategoryClick: handleCategoryClick,
+    onTagClick: handleTagClick,
+    onClearFilters: clearFilters,
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -200,7 +238,7 @@ export default function SearchResults() {
                 <X className="w-5 h-5 text-muted-foreground" />
               </button>
             </div>
-            <Sidebar />
+            <Sidebar {...sidebarProps} />
           </div>
         </div>
       )}
@@ -212,7 +250,7 @@ export default function SearchResults() {
             <h1 className="font-sans text-2xl font-semibold mb-1">Search</h1>
             <p className="text-sm text-muted-foreground">Tesla Malaysia FAQ</p>
           </div>
-          <Sidebar />
+          <Sidebar {...sidebarProps} />
         </aside>
 
         {/* Main */}
