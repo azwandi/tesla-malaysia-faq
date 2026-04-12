@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Car, Zap, Wrench, Shield, Calculator, Sparkles, Settings, DollarSign } from "lucide-react";
+import { ArrowRight, Car, Zap, Wrench, Shield, Sparkles, Settings, DollarSign } from "lucide-react";
 import { faqCategories, fetchFAQsCountByCategory } from "@/data/faqs";
 import { Link } from "react-router-dom";
 
@@ -17,17 +15,15 @@ const categoryIcons = {
 };
 
 const categoryDescriptions = {
-  "Buying & Ownership": "Purchase process, financing, ownership benefits, and getting started with your Tesla",
-  "Charging & Battery": "Charging options, battery care, range optimization, and charging network information",
-  "Driving & Features": "Autopilot, driving modes, entertainment features, and software updates",
-  "Maintenance & Service": "Service schedules, maintenance tips, warranty information, and troubleshooting",
-  "Safety & Security": "Safety features, security systems, emergency procedures, and protection measures",
-  "Models & Variants": "Model comparisons, specifications, configurations, and feature differences",
-  "Costs & Savings": "Running costs, tax benefits, insurance, and financial advantages of ownership",
-  "Fun & Extras": "Customization options, accessories, entertainment features, and unique Tesla experiences"
+  "Buying & Ownership": "Purchase process, financing, and getting started",
+  "Charging & Battery": "Charging options, costs, range, and network",
+  "Driving & Features": "Autopilot, driving modes, and software updates",
+  "Maintenance & Service": "Service schedules, warranty, and troubleshooting",
+  "Safety & Security": "Safety ratings, security systems, and emergency procedures",
+  "Models & Variants": "Model comparisons, specs, and configurations",
+  "Costs & Savings": "Running costs, tax incentives, and financial benefits",
+  "Fun & Extras": "Customization, accessories, and unique Tesla experiences"
 };
-
-const popularCategories = ["Charging & Battery", "Buying & Ownership", "Driving & Features"];
 
 export const CategoriesSection = () => {
   const [categoryCounts, setCategoryCounts] = useState<{ [key: string]: number }>({});
@@ -36,119 +32,71 @@ export const CategoriesSection = () => {
   useEffect(() => {
     const loadCategoryCounts = async () => {
       const counts: { [key: string]: number } = {};
-      
       for (const category of faqCategories) {
-        const count = await fetchFAQsCountByCategory(category);
-        counts[category] = count;
+        counts[category] = await fetchFAQsCountByCategory(category);
       }
-      
       setCategoryCounts(counts);
       setLoading(false);
     };
-
     loadCategoryCounts();
   }, []);
 
-  if (loading) {
-    return (
-      <section className="py-16 px-4 bg-background">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Browse by Category</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Find answers organized by topic. Each category contains detailed FAQs to help
-              you quickly locate the information you need.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {faqCategories.map((category) => (
-              <Card key={category} className="animate-pulse">
-                <CardHeader className="pb-4">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="p-3 rounded-lg bg-muted w-12 h-12"></div>
-                    <div className="h-4 w-16 bg-muted rounded"></div>
-                  </div>
-                  <div className="h-6 w-3/4 bg-muted rounded mb-2"></div>
-                  <div className="h-4 w-full bg-muted rounded"></div>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="flex items-center justify-between">
-                    <div className="h-4 w-20 bg-muted rounded"></div>
-                    <div className="h-4 w-4 bg-muted rounded"></div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-    );
-  }
-
   return (
-    <section className="py-16 px-4 bg-background">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">Browse by Category</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Find answers organized by topic. Each category contains detailed FAQs to help
-            you quickly locate the information you need.
-          </p>
+    <section className="py-16 bg-background">
+      <div className="max-w-6xl mx-auto px-4">
+        {/* Section header */}
+        <div className="mb-10 px-2">
+          <h2 className="font-sans text-5xl font-semibold tracking-tight mb-3">Browse by Topic</h2>
+          <div className="h-px w-16 bg-primary" />
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {faqCategories.map((category) => {
+
+        {/* Numbered editorial grid */}
+        <div className="category-grid grid-cols-2 md:grid-cols-4 rounded-sm overflow-hidden border border-border">
+          {faqCategories.map((category, idx) => {
             const IconComponent = categoryIcons[category as keyof typeof categoryIcons];
-            const isPopular = popularCategories.includes(category);
-            
+            const count = categoryCounts[category] ?? 0;
+            const desc = categoryDescriptions[category as keyof typeof categoryDescriptions];
+
             return (
               <Link
                 key={category}
                 to={`/search?category=${encodeURIComponent(category)}`}
-                className="group"
+                className={`group bg-card hover:bg-primary/5 transition-colors duration-150 p-5 sm:p-6 flex flex-col gap-3 animate-fade-up stagger-${Math.min(idx + 1, 10)}`}
               >
-                <Card className="h-full transition-all duration-200 hover:shadow-lg hover:-translate-y-1 cursor-pointer border-border/50 hover:border-primary/20">
-                  <CardHeader className="pb-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="p-3 rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                        <IconComponent className="h-6 w-6" />
-                      </div>
-                      {isPopular && (
-                        <Badge variant="secondary" className="text-xs bg-primary/10 text-primary border-primary/20">
-                          Popular
-                        </Badge>
-                      )}
-                    </div>
-                    <CardTitle className="text-lg group-hover:text-primary transition-colors">
-                      {category}
-                    </CardTitle>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {categoryDescriptions[category as keyof typeof categoryDescriptions]}
-                    </p>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-foreground">
-                        {categoryCounts[category] || 0} articles
-                      </span>
-                      <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                    </div>
-                  </CardContent>
-                </Card>
+                {/* Number + Icon row */}
+                <div className="flex items-start justify-between">
+                  <span className="font-sans text-4xl font-semibold text-muted-foreground/20 group-hover:text-primary/25 transition-colors leading-none select-none">
+                    {String(idx + 1).padStart(2, '0')}
+                  </span>
+                  <div className="p-2 rounded-md bg-muted/60 text-muted-foreground group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                    <IconComponent className="w-4 h-4" />
+                  </div>
+                </div>
+
+                {/* Category name */}
+                <div>
+                  <h3 className="font-semibold text-base leading-tight group-hover:text-primary transition-colors mb-1.5">
+                    {category}
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
+                    {desc}
+                  </p>
+                </div>
+
+                {/* Article count */}
+                <div className="flex items-center justify-between mt-auto pt-1">
+                  {loading ? (
+                    <div className="h-3.5 w-16 bg-muted animate-pulse rounded" />
+                  ) : (
+                    <span className="text-sm font-semibold text-muted-foreground">
+                      {count} {count === 1 ? 'article' : 'articles'}
+                    </span>
+                  )}
+                  <ArrowRight className="w-3.5 h-3.5 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                </div>
               </Link>
             );
           })}
-        </div>
-        
-        <div className="text-center mt-12">
-          <Link
-            to="/search"
-            className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-medium transition-colors"
-          >
-            View All Categories
-            <ArrowRight className="h-4 w-4" />
-          </Link>
         </div>
       </div>
     </section>

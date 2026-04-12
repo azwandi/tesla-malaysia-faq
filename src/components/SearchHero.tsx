@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, ExternalLink } from "lucide-react";
+import { Search, ExternalLink, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { popularSearchTerms } from "@/data/faqs";
 import { REFERRAL_URL, REFERRAL_DISCOUNT } from "@/lib/referral";
-import teslaMalaysiaHero from '@/assets/tesla-malaysia-hero.jpg';
 
 export const SearchHero = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -25,9 +24,7 @@ export const SearchHero = () => {
   }, []);
 
   const handleSearch = (query: string) => {
-    if (query.trim()) {
-      navigate(`/search?q=${encodeURIComponent(query.trim())}`);
-    }
+    if (query.trim()) navigate(`/search?q=${encodeURIComponent(query.trim())}`);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -36,78 +33,86 @@ export const SearchHero = () => {
   };
 
   return (
-    <section className="relative min-h-[85vh] sm:min-h-[70vh] flex items-center justify-center overflow-hidden">
-      {/* Background Image — light overlay so the image breathes */}
-      <div className="absolute inset-0">
-        <img
-          src={teslaMalaysiaHero}
-          alt="Tesla Model Y with Petronas Twin Towers in Kuala Lumpur"
-          className="w-full h-full object-cover object-center"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/20 to-black/50" />
+    <section className="relative min-h-[80vh] sm:min-h-[68vh] flex items-center justify-center overflow-hidden bg-[#0b0b0c]">
+      {/* Red glow orbs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -bottom-32 -left-32 w-[55%] h-[70%] rounded-full bg-primary/20 blur-[130px]" />
+        <div className="absolute top-0 right-0 w-[35%] h-[50%] rounded-full bg-primary/10 blur-[100px]" />
       </div>
 
-      {/* Glass content card */}
-      <div className="relative z-10 w-full max-w-3xl mx-auto px-4 py-10 sm:py-14 text-center">
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl border border-white/60 px-6 sm:px-10 py-10">
+      {/* Subtle grid overlay */}
+      <div
+        className="absolute inset-0 opacity-[0.04]"
+        style={{
+          backgroundImage:
+            "linear-gradient(hsl(0 0% 100%) 1px, transparent 1px), linear-gradient(90deg, hsl(0 0% 100%) 1px, transparent 1px)",
+          backgroundSize: "48px 48px",
+        }}
+      />
 
-          {/* Headline */}
-          <h1 className="text-3xl sm:text-5xl font-bold text-gray-900 leading-tight mb-3">
-            Buying a Tesla?
-          </h1>
-          <p className="text-base sm:text-lg text-gray-600 mb-8">
-            Answers curated for Malaysians, by Malaysians 🇲🇾
-          </p>
+      {/* Content */}
+      <div className="relative z-10 w-full max-w-2xl mx-auto px-4 py-16 sm:py-20 text-center animate-fade-up">
 
-          {/* Search Bar */}
-          <form onSubmit={handleSubmit} className="mb-6">
-            <div className="relative">
-              <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
-              <Input
-                type="text"
-                placeholder={popularSearchTerms[placeholderIndex]}
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                className={`pl-14 pr-32 py-8 text-lg bg-white border-gray-200 focus-visible:ring-2 rounded-xl transition-opacity duration-300 ${placeholderVisible ? 'placeholder:opacity-100' : 'placeholder:opacity-0'}`}
-              />
-              <Button
-                type="submit"
-                size="lg"
-                className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-6 rounded-lg text-base"
-              >
-                Search
-              </Button>
-            </div>
-          </form>
-
-          {/* Popular searches */}
-          <div className="mb-6">
-            <p className="text-xs text-gray-500 mb-3">Popular searches:</p>
-            <div className="flex flex-wrap justify-center gap-2">
-              {popularSearchTerms.map(term => (
-                <button
-                  key={term}
-                  onClick={() => handleSearch(term)}
-                  className="text-xs px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
-                >
-                  {term}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Referral nudge */}
-          <a
-            href={REFERRAL_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/20 text-primary px-5 py-2.5 rounded-full text-sm font-medium transition-colors"
-          >
-            Already decided? Get <strong>{REFERRAL_DISCOUNT} off</strong> with my referral link
-            <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
-          </a>
-
+        {/* Badge */}
+        <div className="inline-flex items-center gap-2 bg-white/8 border border-white/12 text-white/60 text-xs font-semibold px-3.5 py-1.5 rounded-full mb-8 tracking-wide uppercase">
+          <Zap className="w-3 h-3 text-primary" />
+          Tesla Malaysia FAQ
         </div>
+
+        {/* Headline */}
+        <h1 className="text-4xl sm:text-[3.75rem] font-bold text-white leading-[1.08] tracking-tight mb-5">
+          Everything about buying<br />
+          a Tesla in{" "}
+          <span className="text-primary">Malaysia.</span>
+        </h1>
+
+        <p className="text-white/45 text-base sm:text-lg mb-10 font-normal">
+          Community answers for Malaysian Tesla owners and buyers 🇲🇾
+        </p>
+
+        {/* Search bar */}
+        <form onSubmit={handleSubmit} className="mb-5">
+          <div className="relative shadow-[0_8px_40px_rgba(0,0,0,0.5)]">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 z-10" />
+            <Input
+              type="text"
+              placeholder={popularSearchTerms[placeholderIndex]}
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className={`pl-12 pr-28 h-14 text-base bg-white border-0 rounded-xl focus-visible:ring-2 focus-visible:ring-primary transition-opacity duration-300 ${placeholderVisible ? "placeholder:opacity-100" : "placeholder:opacity-0"}`}
+            />
+            <Button
+              type="submit"
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 h-11 px-5 rounded-lg font-semibold"
+            >
+              Search
+            </Button>
+          </div>
+        </form>
+
+        {/* Popular chips */}
+        <div className="flex flex-wrap justify-center gap-2 mb-8">
+          {popularSearchTerms.map(term => (
+            <button
+              key={term}
+              onClick={() => handleSearch(term)}
+              className="text-sm px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white/65 hover:text-white border border-white/10 font-medium transition-colors"
+            >
+              {term}
+            </button>
+          ))}
+        </div>
+
+        {/* Referral nudge */}
+        <a
+          href={REFERRAL_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 text-white/50 hover:text-white/80 text-sm font-medium transition-colors"
+        >
+          Already decided? Get <span className="text-primary font-semibold">{REFERRAL_DISCOUNT} off</span> with my referral link
+          <ExternalLink className="w-3.5 h-3.5" />
+        </a>
       </div>
     </section>
   );

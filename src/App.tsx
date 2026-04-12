@@ -21,7 +21,7 @@ const AppContent = () => {
   const isAdminPage = location.pathname.startsWith('/admin');
 
   return (
-    <div className="min-h-screen pb-28 sm:pb-16">
+    <div className="min-h-screen">
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/search" element={<SearchResults />} />

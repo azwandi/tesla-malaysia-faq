@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, Link, useNavigate } from "react-router-dom";
-import { Search, ArrowLeft, AlertCircle, Tag, Folder, Car, Zap, Wrench, Shield, Calculator, Sparkles, Settings, DollarSign } from "lucide-react";
+import { Search, ArrowLeft, AlertCircle, Tag, Folder, Car, Zap, Wrench, Shield, Sparkles, Settings, DollarSign, SlidersHorizontal, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { FAQList } from "@/components/FAQ";
 import { searchFAQs, searchFAQsByTag, searchFAQsByCategory, fetchAllTags, faqCategories, FAQ } from "@/data/faqs";
 
@@ -26,19 +25,13 @@ export default function SearchResults() {
   const [tags, setTags] = useState<string[]>([]);
   const [selectedTag, setSelectedTag] = useState<string | null>(searchParams.get("tag") || null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(searchParams.get("category") || null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
-  // Scroll to top when component mounts
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+  useEffect(() => { window.scrollTo(0, 0); }, []);
 
   useEffect(() => {
-    const loadTags = async () => {
-      const tagData = await fetchAllTags();
-      setTags(tagData);
-    };
-    loadTags();
+    fetchAllTags().then(setTags);
   }, []);
 
   useEffect(() => {
@@ -47,20 +40,16 @@ export default function SearchResults() {
       const query = searchParams.get("q") || "";
       const tag = searchParams.get("tag") || "";
       const category = searchParams.get("category") || "";
-      
+
       setSearchQuery(query);
       setSelectedTag(tag || null);
       setSelectedCategory(category || null);
-      
+
       let data: FAQ[] = [];
-      if (category) {
-        data = await searchFAQsByCategory(category);
-      } else if (tag) {
-        data = await searchFAQsByTag(tag);
-      } else {
-        data = await searchFAQs(query);
-      }
-      
+      if (category) data = await searchFAQsByCategory(category);
+      else if (tag) data = await searchFAQsByTag(tag);
+      else data = await searchFAQs(query);
+
       setResults(data);
       setLoading(false);
     };
@@ -69,235 +58,230 @@ export default function SearchResults() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      setSearchParams({ q: searchQuery.trim() });
-    }
+    if (searchQuery.trim()) setSearchParams({ q: searchQuery.trim() });
   };
 
   const handleTagClick = (tag: string) => {
     setSearchParams({ tag });
+    setSidebarOpen(false);
   };
 
   const handleCategoryClick = (category: string) => {
     setSearchParams({ category });
+    setSidebarOpen(false);
   };
 
   const clearFilters = () => {
     setSearchParams({});
+    setSidebarOpen(false);
   };
 
   const currentQuery = searchParams.get("q") || "";
   const currentTag = searchParams.get("tag") || "";
   const currentCategory = searchParams.get("category") || "";
+  const hasFilter = !!(currentCategory || currentTag);
+
+  const Sidebar = () => (
+    <div className="flex flex-col gap-8">
+      {/* Search */}
+      <form onSubmit={handleSearch}>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search questions..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9 pr-20 bg-background text-sm"
+          />
+          <Button type="submit" size="sm" className="absolute right-1 top-1/2 -translate-y-1/2 h-7 text-xs px-3">
+            Go
+          </Button>
+        </div>
+      </form>
+
+      {/* Clear filters */}
+      {hasFilter && (
+        <button
+          onClick={clearFilters}
+          className="flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+        >
+          <X className="w-3.5 h-3.5" /> Clear filters
+        </button>
+      )}
+
+      {/* Categories */}
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <Folder className="w-3.5 h-3.5 text-muted-foreground" />
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Categories</h3>
+        </div>
+        <div className="space-y-0.5">
+          {faqCategories.map((category) => {
+            const IconComponent = categoryIcons[category as keyof typeof categoryIcons];
+            const isSelected = selectedCategory === category;
+            return (
+              <button
+                key={category}
+                onClick={() => handleCategoryClick(category)}
+                className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded text-base transition-colors text-left ${
+                  isSelected
+                    ? 'bg-primary text-primary-foreground font-medium'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                }`}
+              >
+                <IconComponent className="w-3.5 h-3.5 flex-shrink-0" />
+                {category}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Tags */}
+      {tags.length > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <Tag className="w-3.5 h-3.5 text-muted-foreground" />
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tags</h3>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {tags.map((tag) => (
+              <button
+                key={tag}
+                onClick={() => handleTagClick(tag)}
+                className={`text-sm px-2.5 py-1 rounded-full transition-colors ${
+                  selectedTag === tag
+                    ? 'bg-primary text-primary-foreground font-medium'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/70 hover:text-foreground'
+                }`}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-tesla-light-gray/10">
-      {/* Navigation */}
-      <nav className="bg-background/95 backdrop-blur-sm border-b border-border/50 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <Link to="/">
-            <Button variant="ghost" className="hover:bg-accent hover:text-accent-foreground">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Home
-            </Button>
+    <div className="min-h-screen bg-background">
+      {/* Nav */}
+      <nav className="bg-background/95 backdrop-blur-sm border-b border-border sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
+          <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowLeft className="w-4 h-4" />
+            Home
           </Link>
+
+          <span className="font-sans text-lg font-semibold hidden sm:block">JomTesla</span>
+
+          {/* Mobile filter toggle */}
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="md:hidden inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <SlidersHorizontal className="w-4 h-4" />
+            Filter
+            {hasFilter && <span className="w-2 h-2 rounded-full bg-primary" />}
+          </button>
         </div>
       </nav>
 
-      <div className="flex max-w-7xl mx-auto">
-        {/* Side Panel */}
-        <div className="w-80 bg-card/50 backdrop-blur-sm border-r border-border/50 p-6 sticky top-16 h-fit">
-          {/* Search Header */}
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold mb-2">Search Tesla FAQ</h1>
-            <p className="text-muted-foreground text-sm">
-              Find answers to all your Tesla Malaysia questions
-            </p>
+      {/* Mobile sidebar overlay */}
+      {sidebarOpen && (
+        <div className="md:hidden fixed inset-0 z-40 flex">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setSidebarOpen(false)} />
+          <div className="relative ml-auto w-72 bg-background h-full overflow-y-auto p-6 shadow-xl">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="font-semibold">Filter Questions</h2>
+              <button onClick={() => setSidebarOpen(false)}>
+                <X className="w-5 h-5 text-muted-foreground" />
+              </button>
+            </div>
+            <Sidebar />
           </div>
-
-          {/* Search Bar */}
-          <form onSubmit={handleSearch} className="mb-8">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search for Tesla information..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-20 bg-background"
-              />
-              <Button 
-                type="submit"
-                size="sm"
-                className="absolute right-1 top-1/2 -translate-y-1/2"
-              >
-                Search
-              </Button>
-            </div>
-          </form>
-
-          {/* Clear Filters */}
-          {(selectedCategory || selectedTag) && (
-            <div className="mb-6">
-              <Button
-                onClick={clearFilters}
-                variant="outline"
-                size="sm"
-                className="w-full"
-              >
-                Clear All Filters
-              </Button>
-            </div>
-          )}
-
-          {/* Categories Filter */}
-          <div className="mb-8">
-            <div className="flex items-center gap-2 mb-4">
-              <Folder className="w-4 h-4 text-primary" />
-              <h3 className="font-semibold">Categories</h3>
-            </div>
-            <div className="space-y-2">
-              {faqCategories.map((category) => {
-                const IconComponent = categoryIcons[category as keyof typeof categoryIcons];
-                return (
-                  <Badge
-                    key={category}
-                    variant={selectedCategory === category ? "default" : "outline"}
-                    className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors text-xs py-2 px-3 w-full justify-start block text-left"
-                    onClick={() => handleCategoryClick(category)}
-                  >
-                    <div className="flex items-center gap-2">
-                      <IconComponent className="w-3 h-3" />
-                      {category}
-                    </div>
-                  </Badge>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Tags Filter */}
-          {tags.length > 0 && (
-            <div className="mb-8">
-              <div className="flex items-center gap-2 mb-4">
-                <Tag className="w-4 h-4 text-primary" />
-                <h3 className="font-semibold">Tags</h3>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {tags.map((tag) => (
-                  <Badge
-                    key={tag}
-                    variant={selectedTag === tag ? "default" : "outline"}
-                    className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors text-xs py-1 px-2"
-                    onClick={() => handleTagClick(tag)}
-                  >
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
+      )}
 
-        {/* Main Content */}
-        <div className="flex-1 p-6">
-          {/* Results Header */}
+      <div className="flex max-w-7xl mx-auto">
+        {/* Desktop sidebar */}
+        <aside className="hidden md:block w-72 shrink-0 border-r border-border sticky top-[53px] h-[calc(100vh-53px)] overflow-y-auto p-6">
+          <div className="mb-6">
+            <h1 className="font-sans text-2xl font-semibold mb-1">Search</h1>
+            <p className="text-sm text-muted-foreground">Tesla Malaysia FAQ</p>
+          </div>
+          <Sidebar />
+        </aside>
+
+        {/* Main */}
+        <div className="flex-1 min-w-0 px-4 sm:px-8 py-8">
+          {/* Result header */}
           <div className="mb-8">
             {loading ? (
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-                <p className="text-muted-foreground">Searching...</p>
+              <div className="flex items-center gap-3">
+                <div className="w-5 h-5 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                <span className="text-muted-foreground text-sm">Searching…</span>
               </div>
             ) : currentCategory ? (
-              <div>
-                <h2 className="text-2xl font-bold mb-2">
-                  {currentCategory}
-                </h2>
-                <p className="text-muted-foreground">
-                  Found {results.length} {results.length === 1 ? 'result' : 'results'}
-                </p>
-              </div>
+              <>
+                <h2 className="font-sans text-3xl font-semibold mb-1">{currentCategory}</h2>
+                <p className="text-sm text-muted-foreground">{results.length} {results.length === 1 ? 'result' : 'results'}</p>
+              </>
             ) : currentTag ? (
-              <div>
-                <h2 className="text-2xl font-bold mb-2">
-                  FAQs tagged with "{currentTag}"
-                </h2>
-                <p className="text-muted-foreground">
-                  Found {results.length} {results.length === 1 ? 'result' : 'results'}
-                </p>
-              </div>
+              <>
+                <h2 className="font-sans text-3xl font-semibold mb-1">Tagged: {currentTag}</h2>
+                <p className="text-sm text-muted-foreground">{results.length} {results.length === 1 ? 'result' : 'results'}</p>
+              </>
             ) : currentQuery ? (
-              <div>
-                <h2 className="text-2xl font-bold mb-2">
-                  Search Results for "{currentQuery}"
+              <>
+                <h2 className="font-sans text-3xl font-semibold mb-1">
+                  Results for <span className="italic">"{currentQuery}"</span>
                 </h2>
-                <p className="text-muted-foreground">
-                  Found {results.length} {results.length === 1 ? 'result' : 'results'}
-                </p>
-              </div>
+                <p className="text-sm text-muted-foreground">{results.length} {results.length === 1 ? 'result' : 'results'}</p>
+              </>
             ) : (
-              <div>
-                <h2 className="text-2xl font-bold mb-2">All FAQ Questions</h2>
-                <p className="text-muted-foreground">
-                  Browse all {results.length} frequently asked questions
-                </p>
-              </div>
+              <>
+                <h2 className="font-sans text-3xl font-semibold mb-1">All Questions</h2>
+                <p className="text-sm text-muted-foreground">{results.length} questions</p>
+              </>
             )}
           </div>
 
-          {/* Results */}
           {!loading && (
-            <>
-              {results.length > 0 ? (
-                <FAQList 
-                  faqs={results} 
-                  showViewAll={false} 
-                  fromSearch={true}
-                  searchQuery={currentQuery}
-                  searchTag={currentTag}
-                  searchCategory={currentCategory}
-                />
-              ) : (
-                <div className="text-center py-16">
-                  <div className="max-w-2xl mx-auto">
-                    <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
-                      <AlertCircle className="w-10 h-10 text-primary" />
-                    </div>
-                    <h3 className="text-2xl font-bold mb-4">No Results Found</h3>
-                    <p className="text-muted-foreground mb-8 text-lg">
-                      {currentCategory 
-                        ? `No FAQs found in the "${currentCategory}" category. Try selecting a different category or browse all questions.`
-                        : currentTag 
-                        ? `No FAQs found with the tag "${currentTag}". Try selecting a different tag or browse all questions.`
-                        : `We couldn't find any questions matching "${currentQuery}". Try different keywords or browse all questions.`
-                      }
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
-                      <Button 
-                        onClick={() => {
-                          setSearchQuery("");
-                          setSelectedTag(null);
-                          setSelectedCategory(null);
-                          setSearchParams({});
-                        }}
-                        variant="outline"
-                        className="flex-1 sm:flex-none"
-                      >
-                        View All Questions
-                      </Button>
-                      <Link to="/">
-                        <Button 
-                          variant="secondary" 
-                          className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white"
-                        >
-                          Back to Home
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
+            results.length > 0 ? (
+              <FAQList
+                faqs={results}
+                showViewAll={false}
+                fromSearch={true}
+                searchQuery={currentQuery}
+                searchTag={currentTag}
+                searchCategory={currentCategory}
+              />
+            ) : (
+              <div className="text-center py-20">
+                <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mx-auto mb-5">
+                  <AlertCircle className="w-7 h-7 text-muted-foreground" />
                 </div>
-              )}
-            </>
+                <h3 className="text-xl font-semibold mb-3">No results found</h3>
+                <p className="text-muted-foreground text-sm mb-8 max-w-sm mx-auto">
+                  {currentCategory
+                    ? `No FAQs in "${currentCategory}". Try a different category.`
+                    : currentTag
+                    ? `No FAQs tagged "${currentTag}".`
+                    : `No matches for "${currentQuery}". Try different keywords.`}
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Button variant="outline" size="sm" onClick={clearFilters}>
+                    View All Questions
+                  </Button>
+                  <Link to="/">
+                    <Button size="sm">Back to Home</Button>
+                  </Link>
+                </div>
+              </div>
+            )
           )}
         </div>
       </div>

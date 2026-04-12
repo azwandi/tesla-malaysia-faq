@@ -1,11 +1,10 @@
 import { useParams, Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
-import { ArrowLeft, Car, Tag, Lightbulb, Zap, Settings, ExternalLink } from "lucide-react";
+import { ArrowLeft, Car, Zap, Settings, ExternalLink, ChevronRight } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { getFAQBySlug, fetchRelatedFAQs, FAQ } from "@/data/faqs";
 import ReactMarkdown from 'react-markdown';
@@ -41,48 +40,35 @@ export default function FAQDetail() {
     window.scrollTo(0, 0);
   }, [slug]);
 
-  if (!slug) {
-    return <Navigate to="/" replace />;
-  }
+  if (!slug) return <Navigate to="/" replace />;
 
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="max-w-4xl mx-auto px-6 py-16">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Loading FAQ...</p>
+        <div className="max-w-3xl mx-auto px-6 py-24">
+          <div className="space-y-4 animate-pulse">
+            <div className="h-4 w-24 bg-muted rounded" />
+            <div className="h-10 w-3/4 bg-muted rounded" />
+            <div className="h-10 w-1/2 bg-muted rounded" />
+            <div className="mt-8 space-y-3">
+              {[...Array(5)].map((_, i) => <div key={i} className="h-4 bg-muted rounded w-full" />)}
+            </div>
           </div>
         </div>
       </div>
     );
   }
 
-  if (!faq) {
-    return <Navigate to="/" replace />;
-  }
+  if (!faq) return <Navigate to="/" replace />;
 
-  // Function to handle back navigation
   const handleBackNavigation = () => {
-    // Check if user came from search results page
     if (location.state?.fromSearch) {
-      // Reconstruct the search URL with all parameters
       const params = new URLSearchParams();
-      
-      if (location.state.searchQuery) {
-        params.set('q', location.state.searchQuery);
-      }
-      if (location.state.searchTag) {
-        params.set('tag', location.state.searchTag);
-      }
-      if (location.state.searchCategory) {
-        params.set('category', location.state.searchCategory);
-      }
-      
-      const searchUrl = params.toString() ? `/search?${params.toString()}` : '/search';
-      navigate(searchUrl);
+      if (location.state.searchQuery) params.set('q', location.state.searchQuery);
+      if (location.state.searchTag) params.set('tag', location.state.searchTag);
+      if (location.state.searchCategory) params.set('category', location.state.searchCategory);
+      navigate(params.toString() ? `/search?${params.toString()}` : '/search');
     } else {
-      // Go back to homepage
       navigate('/');
     }
   };
@@ -101,10 +87,7 @@ export default function FAQDetail() {
     mainEntity: [{
       '@type': 'Question',
       name: faq.question,
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: plainAnswer,
-      },
+      acceptedAnswer: { '@type': 'Answer', text: plainAnswer },
     }],
   });
 
@@ -123,220 +106,230 @@ export default function FAQDetail() {
         <script type="application/ld+json">{jsonLd}</script>
       </Helmet>
 
-      {/* Navigation */}
+      {/* Navigation bar */}
       <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
-          <Button 
-            variant="ghost" 
-            className="hover:bg-accent hover:text-accent-foreground"
+        <div className="max-w-3xl mx-auto px-6 py-3 flex justify-between items-center">
+          <button
             onClick={handleBackNavigation}
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <ArrowLeft className="w-4 h-4" />
             Back
-          </Button>
-          
-          {/* Admin Edit Button */}
-          {user && faq && (
+          </button>
+
+          {user && (
             <Link to={`/admin/faq/edit/${faq.slug}`}>
-              <Button variant="outline" size="sm">
-                <Settings className="w-4 h-4 mr-2" />
-                Edit FAQ
+              <Button variant="outline" size="sm" className="h-8 text-xs">
+                <Settings className="w-3.5 h-3.5 mr-1.5" />
+                Edit
               </Button>
             </Link>
           )}
         </div>
       </nav>
 
-      {/* Content */}
-      <main className="max-w-4xl mx-auto px-6 py-12">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-start gap-4 mb-6">
-            <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-1">
-              <Zap className="w-6 h-6 text-primary-foreground" />
-            </div>
-            <div className="flex-1">
-              <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-4">
-                {faq.question}
-              </h1>
-            </div>
-          </div>
-
-          {/* Tags and Models */}
-          <div className="ml-16 space-y-4">
-            {/* Category */}
-            {faq.category && (
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground mb-2">Category:</h3>
-                <Badge variant="default" className="text-sm">
-                  {faq.category}
-                </Badge>
-              </div>
-            )}
-
-            {/* Affected Models */}
-            {faq.affected_models && faq.affected_models.length > 0 && (
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground mb-2">Applicable Models:</h3>
-                <div className="flex flex-wrap gap-2">
-                  {faq.affected_models.map((model) => (
-                    <Badge 
-                      key={model} 
-                      variant="secondary"
-                      className=""
-                    >
-                      <Car className="w-3 h-3 mr-1" />
-                      {model}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Tags */}
-            {faq.tags && faq.tags.length > 0 && (
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground mb-2">Tags:</h3>
-                <div className="flex flex-wrap gap-2">
-                  {faq.tags.map((tag) => (
-                    <Link 
-                      key={tag} 
-                      to={`/search?tag=${encodeURIComponent(tag)}`}
-                      className="inline-block"
-                    >
-                      <Badge 
-                        variant="outline"
-                        className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
-                      >
-                        {tag}
-                      </Badge>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+      <main className="max-w-3xl mx-auto px-6 py-12 pb-24">
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-8 animate-fade-up">
+          <Link to="/" className="hover:text-foreground transition-colors">JomTesla</Link>
+          <ChevronRight className="w-3 h-3" />
+          {faq.category && (
+            <>
+              <Link
+                to={`/search?category=${encodeURIComponent(faq.category)}`}
+                className="hover:text-foreground transition-colors"
+              >
+                {faq.category}
+              </Link>
+              <ChevronRight className="w-3 h-3" />
+            </>
+          )}
+          <span className="text-foreground/50 truncate max-w-[200px]">{faq.question.slice(0, 40)}…</span>
         </div>
 
-        <Separator className="my-8" />
-
-        {/* Answer */}
-        <Card className="bg-card border-none shadow-none">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-xl">
-              <Lightbulb className="w-5 h-5 text-primary" />
-              Detailed Answer
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="prose prose-gray max-w-none">
-              <ReactMarkdown 
-                remarkPlugins={[remarkGfm]}
-                components={{
-                  p: ({children}) => <p className="text-lg leading-relaxed mb-4">{children}</p>,
-                  strong: ({children}) => <strong className="font-semibold text-foreground">{children}</strong>,
-                  em: ({children}) => <em className="italic text-foreground">{children}</em>,
-                  code: ({children}) => <code className="bg-muted px-1 py-0.5 rounded text-sm font-mono">{children}</code>,
-                  h1: ({children}) => <h1 className="text-2xl font-bold text-foreground mb-4">{children}</h1>,
-                  h2: ({children}) => <h2 className="text-xl font-bold text-foreground mb-3">{children}</h2>,
-                  h3: ({children}) => <h3 className="text-lg font-bold text-foreground mb-2">{children}</h3>,
-                  ul: ({children}) => <ul className="list-disc list-outside pl-6 mb-4 space-y-1.5">{children}</ul>,
-                  ol: ({children}) => <ol className="list-decimal list-outside pl-6 mb-4 space-y-1.5">{children}</ol>,
-                  li: ({children}) => <li className="text-foreground leading-relaxed">{children}</li>,
-                  blockquote: ({children}) => <blockquote className="border-l-4 border-primary pl-4 italic text-foreground/80 mb-4">{children}</blockquote>,
-                  a: ({href, children}) => (
-                    <a
-                      href={href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary hover:text-primary/80 underline underline-offset-2 hover:underline-offset-4 transition-all duration-200"
-                    >
-                      {children}
-                    </a>
-                  ),
-                  table: ({children}) => (
-                    <div className="overflow-x-auto my-6 rounded-lg border border-border">
-                      <table className="w-full text-sm border-collapse">{children}</table>
-                    </div>
-                  ),
-                  thead: ({children}) => <thead className="bg-muted/60">{children}</thead>,
-                  tbody: ({children}) => <tbody className="divide-y divide-border">{children}</tbody>,
-                  tr: ({children}) => <tr className="hover:bg-muted/30 transition-colors">{children}</tr>,
-                  th: ({children}) => (
-                    <th className="px-4 py-3 text-left font-semibold text-foreground text-sm border-b border-border">
-                      {children}
-                    </th>
-                  ),
-                  td: ({children}) => (
-                    <td className="px-4 py-3 text-foreground/90 align-top">
-                      {children}
-                    </td>
-                  ),
-                }}
-              >
-                {faq.answer}
-              </ReactMarkdown>
+        {/* Question headline */}
+        <div className="mb-8 animate-fade-up stagger-1">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+              <Zap className="w-3.5 h-3.5 text-primary-foreground" />
             </div>
-          </CardContent>
-        </Card>
+            {faq.category && (
+              <Badge variant="secondary" className="text-xs font-medium">
+                {faq.category}
+              </Badge>
+            )}
+          </div>
 
-        {/* Competitor Comparison */}
+          <h1 className="font-sans text-3xl sm:text-4xl font-semibold leading-tight tracking-tight text-foreground">
+            {faq.question}
+          </h1>
+        </div>
+
+        {/* Affected Models + Tags */}
+        {((faq.affected_models && faq.affected_models.length > 0) || (faq.tags && faq.tags.length > 0)) && (
+          <div className="flex flex-wrap gap-2 mb-8 pb-8 border-b border-border animate-fade-up stagger-2">
+            {faq.affected_models?.map((model) => (
+              <span
+                key={model}
+                className="inline-flex items-center gap-1 text-xs font-medium bg-muted text-muted-foreground px-2.5 py-1 rounded-full"
+              >
+                <Car className="w-3 h-3" />
+                {model}
+              </span>
+            ))}
+            {faq.tags?.map((tag) => (
+              <Link
+                key={tag}
+                to={`/search?tag=${encodeURIComponent(tag)}`}
+                className="text-xs font-medium bg-accent text-accent-foreground hover:bg-primary hover:text-primary-foreground px-2.5 py-1 rounded-full transition-colors"
+              >
+                {tag}
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {/* Answer — prose-reading class applies Lora serif */}
+        <div className="prose-reading animate-fade-up stagger-3">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              p: ({ children }) => (
+                <p className="mb-5 leading-[1.85] text-foreground/90 text-lg">{children}</p>
+              ),
+              strong: ({ children }) => (
+                <strong className="font-semibold text-foreground">{children}</strong>
+              ),
+              em: ({ children }) => (
+                <em className="italic">{children}</em>
+              ),
+              code: ({ children }) => (
+                <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-foreground">{children}</code>
+              ),
+              h1: ({ children }) => (
+                <h1 className="font-sans text-2xl font-bold text-foreground mb-4 mt-8">{children}</h1>
+              ),
+              h2: ({ children }) => (
+                <h2 className="font-sans text-xl font-bold text-foreground mb-3 mt-7">{children}</h2>
+              ),
+              h3: ({ children }) => (
+                <h3 className="font-sans text-lg font-semibold text-foreground mb-2 mt-6">{children}</h3>
+              ),
+              ul: ({ children }) => (
+                <ul className="list-disc list-outside pl-6 mb-5 space-y-2">{children}</ul>
+              ),
+              ol: ({ children }) => (
+                <ol className="list-decimal list-outside pl-6 mb-5 space-y-2">{children}</ol>
+              ),
+              li: ({ children }) => (
+                <li className="leading-relaxed text-foreground/90 text-lg">{children}</li>
+              ),
+              blockquote: ({ children }) => (
+                <blockquote className="border-l-[3px] border-primary pl-5 italic text-foreground/70 mb-5 bg-primary/5 py-3 pr-4 rounded-r-sm">
+                  {children}
+                </blockquote>
+              ),
+              a: ({ href, children }) => (
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary underline underline-offset-2 decoration-primary/40 hover:decoration-primary transition-all"
+                >
+                  {children}
+                </a>
+              ),
+              table: ({ children }) => (
+                <div className="overflow-x-auto my-6 rounded-md border border-border shadow-sm">
+                  <table className="w-full text-sm border-collapse font-sans">{children}</table>
+                </div>
+              ),
+              thead: ({ children }) => (
+                <thead className="bg-muted/70">{children}</thead>
+              ),
+              tbody: ({ children }) => (
+                <tbody className="divide-y divide-border">{children}</tbody>
+              ),
+              tr: ({ children }) => (
+                <tr className="hover:bg-muted/30 transition-colors">{children}</tr>
+              ),
+              th: ({ children }) => (
+                <th className="px-4 py-2.5 text-left font-semibold text-foreground text-xs uppercase tracking-wide border-b border-border">
+                  {children}
+                </th>
+              ),
+              td: ({ children }) => (
+                <td className="px-4 py-3 text-foreground/85 align-top leading-relaxed">
+                  {children}
+                </td>
+              ),
+            }}
+          >
+            {faq.answer}
+          </ReactMarkdown>
+        </div>
+
+        {/* Competitor info */}
         {faq.competitor_info && (
-          <Card className="mt-8 bg-accent/20 border-border">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-xl text-foreground">
-                <Car className="w-5 h-5" />
-                Competitive Advantage
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
+          <div className="mt-8 p-5 rounded-md bg-muted/50 border border-border animate-fade-up stagger-4">
+            <div className="flex items-center gap-2 mb-4">
+              <Car className="w-4 h-4 text-muted-foreground" />
+              <h3 className="font-semibold text-sm">Competitive Advantage</h3>
+            </div>
+            <div className="space-y-2 text-sm">
               {Object.entries(faq.competitor_info).map(([key, value]) => (
-                <div key={key} className="mb-2">
-                  <strong className="capitalize">{key.replace('_', ' ')}:</strong>
-                  <span className="ml-2 text-foreground/90">{value}</span>
+                <div key={key} className="flex gap-2">
+                  <span className="font-medium capitalize text-muted-foreground min-w-[80px]">
+                    {key.replace('_', ' ')}:
+                  </span>
+                  <span className="text-foreground/85">{value as string}</span>
                 </div>
               ))}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
 
         {/* Referral CTA */}
         {isHighIntent ? (
-          <div className="mt-10 rounded-xl border border-primary/30 bg-primary/5 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="mt-10 rounded-md border border-primary/25 bg-primary/5 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-fade-up stagger-4">
             <div>
               <p className="font-semibold text-foreground mb-1">Ready to order your Tesla?</p>
-              <p className="text-sm text-muted-foreground">Use my referral link and get <span className="font-semibold text-foreground">{REFERRAL_DISCOUNT} off</span> your purchase — and help keep this site running.</p>
+              <p className="text-sm text-muted-foreground">
+                Use my referral link and get <span className="font-semibold text-foreground">{REFERRAL_DISCOUNT} off</span> — and help keep this site running.
+              </p>
             </div>
             <a
               href={REFERRAL_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-shrink-0 inline-flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors px-5 py-2.5 rounded-lg text-sm font-semibold"
+              className="flex-shrink-0 inline-flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors px-5 py-2.5 rounded text-sm font-semibold"
             >
               Order with Referral
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
           </div>
         ) : (
-          <div className="mt-10 flex items-center justify-between gap-4 rounded-lg border border-border bg-muted/30 px-5 py-3">
-            <p className="text-sm text-muted-foreground">Thinking of buying a Tesla? Get <span className="font-medium text-foreground">{REFERRAL_DISCOUNT} off</span> with my referral link.</p>
+          <div className="mt-10 flex items-center justify-between gap-4 rounded border border-border bg-muted/30 px-5 py-3 animate-fade-up stagger-4">
+            <p className="text-sm text-muted-foreground">
+              Thinking of buying a Tesla? Get <span className="font-medium text-foreground">{REFERRAL_DISCOUNT} off</span> with my referral link.
+            </p>
             <a
               href={REFERRAL_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-shrink-0 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+              className="flex-shrink-0 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
             >
-              Claim discount <ExternalLink className="w-3 h-3" />
+              Claim <ExternalLink className="w-3 h-3" />
             </a>
           </div>
         )}
 
-        {/* Feedback Section */}
+        {/* Feedback */}
         <div className="mt-12 pt-8 border-t border-border">
           <div className="flex flex-col items-center text-center mb-6">
-            <h3 className="text-lg font-semibold mb-2">Was this helpful?</h3>
+            <h3 className="font-semibold mb-1.5">Was this helpful?</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Share your feedback to help us improve this content for fellow Malaysians.
+              Help us improve this content for fellow Malaysians.
             </p>
             <FeedbackForm faqId={faq.id} />
           </div>
@@ -345,43 +338,41 @@ export default function FAQDetail() {
         {/* Related FAQs */}
         {relatedFAQs.length > 0 && (
           <div className="mt-12 pt-8 border-t border-border">
-            <h3 className="text-lg font-semibold mb-4">Related Questions</h3>
-            <div className="space-y-3">
+            <h3 className="font-semibold mb-5">Related Questions</h3>
+            <div className="space-y-0 divide-y divide-border">
               {relatedFAQs.map((related) => (
                 <Link
                   key={related.slug}
                   to={`/faq/${related.slug}`}
-                  className="block p-4 rounded-lg border border-border hover:bg-accent transition-colors"
+                  className="group flex items-center justify-between gap-4 py-4 hover:text-primary transition-colors"
                 >
-                  <p className="font-medium text-sm leading-snug">{related.question}</p>
-                  {related.category && (
-                    <span className="text-xs text-muted-foreground mt-1 inline-block">{related.category}</span>
-                  )}
+                  <div>
+                    <p className="text-sm font-medium leading-snug group-hover:text-primary transition-colors">{related.question}</p>
+                    {related.category && (
+                      <span className="text-xs text-muted-foreground mt-0.5 inline-block">{related.category}</span>
+                    )}
+                  </div>
+                  <ArrowLeft className="w-4 h-4 text-muted-foreground/40 rotate-180 group-hover:text-primary group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                 </Link>
               ))}
             </div>
           </div>
         )}
 
-        {/* Navigation */}
-        <div className="mt-8 pt-8 border-t border-border">
-          <div className="flex flex-col sm:flex-row gap-4 justify-between">
-            <Link to="/">
-              <Button variant="outline" className="w-full sm:w-auto">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Home
-              </Button>
-            </Link>
-            <Link to="/search">
-              <Button 
-                variant="default" 
-                className="w-full sm:w-auto"
-              >
-                Search More Questions
-                <Zap className="w-4 h-4 ml-2" />
-              </Button>
-            </Link>
-          </div>
+        {/* Bottom nav */}
+        <div className="mt-8 pt-8 border-t border-border flex flex-col sm:flex-row gap-3 justify-between">
+          <Link to="/">
+            <Button variant="outline" size="sm" className="gap-2">
+              <ArrowLeft className="w-3.5 h-3.5" />
+              Back to Home
+            </Button>
+          </Link>
+          <Link to="/search">
+            <Button size="sm" className="gap-2">
+              Browse All Questions
+              <Zap className="w-3.5 h-3.5" />
+            </Button>
+          </Link>
         </div>
       </main>
     </div>
