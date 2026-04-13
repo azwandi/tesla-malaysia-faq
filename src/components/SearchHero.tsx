@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { popularSearchTerms } from "@/data/faqs";
 import { REFERRAL_URL, REFERRAL_DISCOUNT } from "@/lib/referral";
+import { trackEvent } from "@/lib/analytics";
 
 export const SearchHero = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -108,6 +109,7 @@ export const SearchHero = () => {
           href={REFERRAL_URL}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => trackEvent("referral_clicked", { placement: "hero" })}
           className="inline-flex items-center gap-2 text-white/50 hover:text-white/80 text-sm font-medium transition-colors"
         >
           Already decided? Get <span className="text-primary font-semibold">{REFERRAL_DISCOUNT} off</span> with my referral link

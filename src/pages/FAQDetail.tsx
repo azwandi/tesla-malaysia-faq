@@ -11,6 +11,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { FeedbackForm } from "@/components/FeedbackForm";
 import { REFERRAL_URL, REFERRAL_DISCOUNT, PURCHASE_INTENT_CATEGORIES, PURCHASE_INTENT_TAGS } from "@/lib/referral";
+import { trackEvent } from "@/lib/analytics";
 
 export default function FAQDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -35,6 +36,17 @@ export default function FAQDetail() {
     };
     loadFAQ();
   }, [slug]);
+
+  useEffect(() => {
+    if (!faq) return;
+
+    trackEvent("faq_viewed", {
+      faq_id: faq.id,
+      slug: faq.slug,
+      category: faq.category,
+      tags: faq.tags.join(","),
+    });
+  }, [faq]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -81,6 +93,14 @@ export default function FAQDetail() {
   const description = plainAnswer.slice(0, 155).trim() + '…';
   const pageTitle = `${faq.question} | JomTesla`;
   const pageUrl = `https://jomtesla.my/faq/${faq.slug}`;
+  const handleReferralClick = (placement: "faq_high_intent" | "faq_low_intent") => {
+    trackEvent("referral_clicked", {
+      faq_slug: faq.slug,
+      category: faq.category,
+      placement,
+      high_intent: isHighIntent,
+    });
+  };
   const jsonLd = JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -302,6 +322,7 @@ export default function FAQDetail() {
               href={REFERRAL_URL}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => handleReferralClick("faq_high_intent")}
               className="flex-shrink-0 inline-flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors px-5 py-2.5 rounded text-sm font-semibold"
             >
               Order with Referral
@@ -317,6 +338,7 @@ export default function FAQDetail() {
               href={REFERRAL_URL}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => handleReferralClick("faq_low_intent")}
               className="flex-shrink-0 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
             >
               Claim <ExternalLink className="w-3 h-3" />
@@ -331,7 +353,7 @@ export default function FAQDetail() {
             <p className="text-sm text-muted-foreground mb-4">
               Help us improve this content for fellow Malaysians.
             </p>
-            <FeedbackForm faqId={faq.id} />
+            <FeedbackForm faqId={faq.id} faqSlug={faq.slug} />
           </div>
         </div>
 

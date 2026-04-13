@@ -1,6 +1,7 @@
 import { ExternalLink, Zap } from "lucide-react";
 import { REFERRAL_URL, REFERRAL_DISCOUNT } from "@/lib/referral";
 import { Link } from "react-router-dom";
+import { trackEvent } from "@/lib/analytics";
 
 export const Footer = () => {
   return (
@@ -36,6 +37,7 @@ export const Footer = () => {
                 href={REFERRAL_URL}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackEvent("referral_clicked", { placement: "footer" })}
                 className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
               >
                 Get {REFERRAL_DISCOUNT} off with referral

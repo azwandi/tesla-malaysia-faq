@@ -25,6 +25,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { trackEvent } from "@/lib/analytics";
 
 const feedbackFormSchema = z.object({
   contactInfo: z.string().optional(),
@@ -35,9 +36,10 @@ const feedbackFormSchema = z.object({
 
 interface FeedbackFormProps {
   faqId: string;
+  faqSlug: string;
 }
 
-export function FeedbackForm({ faqId }: FeedbackFormProps) {
+export function FeedbackForm({ faqId, faqSlug }: FeedbackFormProps) {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -69,6 +71,10 @@ export function FeedbackForm({ faqId }: FeedbackFormProps) {
       toast({
         title: "Feedback submitted successfully!",
         description: "Thank you for helping us improve our content.",
+      });
+      trackEvent("feedback_submitted", {
+        faq_id: faqId,
+        faq_slug: faqSlug,
       });
 
       form.reset();

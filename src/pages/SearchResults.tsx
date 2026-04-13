@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FAQList } from "@/components/FAQ";
 import { searchFAQs, searchFAQsByTag, searchFAQsByCategory, fetchAllTags, faqCategories, FAQ } from "@/data/faqs";
+import { trackEvent } from "@/lib/analytics";
 
 const categoryIcons = {
   "Buying & Ownership": Car,
@@ -160,6 +161,13 @@ export default function SearchResults() {
       else data = await searchFAQs(query);
 
       setResults(data);
+      if (query.trim()) {
+        trackEvent("search_performed", {
+          query_length: query.trim().length,
+          result_count: data.length,
+          zero_results: data.length === 0,
+        });
+      }
       setLoading(false);
     };
     loadResults();
@@ -171,11 +179,13 @@ export default function SearchResults() {
   };
 
   const handleTagClick = (tag: string) => {
+    trackEvent("tag_clicked", { tag });
     setSearchParams({ tag });
     setSidebarOpen(false);
   };
 
   const handleCategoryClick = (category: string) => {
+    trackEvent("category_clicked", { category });
     setSearchParams({ category });
     setSidebarOpen(false);
   };
