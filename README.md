@@ -12,6 +12,7 @@ A community-driven FAQ platform for Tesla owners and prospective buyers in Malay
 - **FAQ detail pages** — Individual pages with user feedback forms
 - **Admin dashboard** — Manage FAQs with publish/draft/featured toggles, tag filters, and bulk CSV import
 - **Supabase backend** — Row-level security with public read access and authenticated write access
+- **PostHog analytics** — Public pageviews plus FAQ, search, feedback, and referral tracking
 
 ## Tech Stack
 
@@ -22,6 +23,7 @@ A community-driven FAQ platform for Tesla owners and prospective buyers in Malay
 | Routing | React Router v6 |
 | Data fetching | TanStack Query v5 |
 | Backend | Supabase (PostgreSQL + Auth) |
+| Analytics | PostHog |
 | Markdown | react-markdown, remark-gfm |
 
 ## Getting Started
@@ -43,8 +45,15 @@ cp .env.example .env
 |---|---|
 | `VITE_SUPABASE_URL` | Your Supabase project URL |
 | `VITE_SUPABASE_PUBLISHABLE_KEY` | Your Supabase `anon` public key |
+| `VITE_POSTHOG_KEY` | Your PostHog project API key |
+| `VITE_POSTHOG_HOST` | Your PostHog ingestion host, e.g. `https://us.i.posthog.com` |
 
 Both values are found in your Supabase project under **Settings → API**.
+
+For PostHog Cloud, the host usually matches your region:
+
+- US: `https://us.i.posthog.com`
+- EU: `https://eu.i.posthog.com`
 
 > **Never commit `.env` to version control.** It is listed in `.gitignore`.
 
@@ -75,6 +84,23 @@ Preview the production build locally:
 ```sh
 npm run preview
 ```
+
+## Analytics
+
+The site sends PostHog events only in production builds when `VITE_POSTHOG_KEY` is present. Local development does not send analytics by default.
+
+Tracked events:
+
+- `$pageview` on public routes only
+- `faq_viewed`
+- `search_performed`
+- `feedback_submitted`
+- `referral_clicked`
+- `tag_clicked`
+- `category_clicked`
+- `not_found_viewed`
+
+Admin routes under `/admin/*` are excluded from analytics.
 
 ## Project Structure
 
