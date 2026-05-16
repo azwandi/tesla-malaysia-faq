@@ -10,7 +10,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { logError } from '@/lib/logger';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit2, Trash2, LogOut, Upload, FileText, MessageSquare, CheckCircle, ExternalLink, Search, Tag, Filter, X, Car } from 'lucide-react';
+import { Plus, Edit2, Trash2, LogOut, FileText, MessageSquare, CheckCircle, ExternalLink, Search, Tag, Filter, X, Car } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -51,8 +51,7 @@ const AdminDashboard = () => {
   const [feedback, setFeedback] = useState<Feedback[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isFeedbackLoading, setIsFeedbackLoading] = useState(true);
-  const [isUploading, setIsUploading] = useState(false);
-  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; type: 'faq' | 'feedback'; id: string | null }>({
+const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; type: 'faq' | 'feedback'; id: string | null }>({
     open: false,
     type: 'faq',
     id: null,
@@ -331,200 +330,6 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleCSVUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    // Check authentication first
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      toast({
-        title: "Authentication Required",
-        description: "You must be logged in to upload FAQs",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsUploading(true);
-    
-    try {
-      const text = await file.text();
-      const lines = text.split('\n').filter(line => line.trim());
-      
-      if (lines.length === 0) {
-        throw new Error('CSV file is empty');
-      }
-
-      // Function to parse CSV line properly handling quoted fields
-      const parseCSVLine = (line: string): string[] => {
-        const result: string[] = [];
-        let current = '';
-        let inQuotes = false;
-        
-        for (let i = 0; i < line.length; i++) {
-          const char = line[i];
-          const nextChar = line[i + 1];
-          
-          if (char === '"') {
-            if (inQuotes && nextChar === '"') {
-              // Escaped quote
-              current += '"';
-              i++; // Skip next quote
-            } else {
-              // Toggle quote state
-              inQuotes = !inQuotes;
-            }
-          } else if (char === ',' && !inQuotes) {
-            // End of field
-            result.push(current.trim());
-            current = '';
-          } else {
-            current += char;
-          }
-        }
-        
-        // Add the last field
-        result.push(current.trim());
-        return result;
-      };
-
-      // Parse CSV header
-      const headers = parseCSVLine(lines[0]);
-      const requiredHeaders = ['slug', 'question', 'answer'];
-      
-      const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
-      if (missingHeaders.length > 0) {
-        throw new Error(`Missing required columns: ${missingHeaders.join(', ')}`);
-      }
-
-      const csvData = [];
-      const slugsInCSV = new Set<string>();
-      const errors: string[] = [];
-      
-      // Parse each row and check for duplicates within CSV
-      for (let i = 1; i < lines.length; i++) {
-        const values = parseCSVLine(lines[i]);
-        if (values.length !== headers.length) {
-          errors.push(`Row ${i + 1}: Expected ${headers.length} columns, got ${values.length}`);
-          continue;
-        }
-        
-        const row: any = {};
-        headers.forEach((header, index) => {
-          row[header] = values[index];
-        });
-
-        // Validate required fields
-        if (!row.slug || !row.question || !row.answer) {
-          errors.push(`Row ${i + 1}: Missing required fields`);
-          continue;
-        }
-
-        // Check for duplicate slugs within the CSV
-        if (slugsInCSV.has(row.slug)) {
-          errors.push(`Row ${i + 1}: Duplicate slug '${row.slug}' found in CSV`);
-          continue;
-        }
-        slugsInCSV.add(row.slug);
-
-        try {
-          // Process the data
-          const faqData = {
-            slug: row.slug,
-            question: row.question,
-            answer: row.answer,
-            tags: row.tags ? row.tags.split(';').map((t: string) => t.trim()).filter(Boolean) : [],
-            affected_models: row.affected_models ? row.affected_models.split(';').map((m: string) => m.trim()).filter(Boolean) : [],
-            is_published: row.is_published === 'true' || row.is_published === '1' || !row.is_published,
-            competitor_info: row.competitor_info ? (row.competitor_info.trim() ? JSON.parse(row.competitor_info) : null) : null,
-          };
-
-          csvData.push({ ...faqData, rowNumber: i + 1 });
-        } catch (parseError) {
-          errors.push(`Row ${i + 1}: Invalid JSON in competitor_info`);
-        }
-      }
-
-      if (errors.length > 0) {
-        throw new Error(`CSV validation errors:\n${errors.join('\n')}`);
-      }
-
-      // Get all existing FAQs to check for conflicts
-      const { data: existingFaqs, error: fetchError } = await supabase
-        .from('faqs')
-        .select('slug')
-        .in('slug', Array.from(slugsInCSV));
-
-      if (fetchError) {
-        throw new Error(`Failed to check existing FAQs: ${fetchError.message}`);
-      }
-
-      const existingSlugs = new Set(existingFaqs?.map(f => f.slug) || []);
-
-      // Process upserts using Supabase's native upsert functionality
-      let createdCount = 0;
-      let updatedCount = 0;
-      const processingErrors: string[] = [];
-
-      // Process in batches to avoid overwhelming the database
-      const batchSize = 10;
-      for (let i = 0; i < csvData.length; i += batchSize) {
-        const batch = csvData.slice(i, i + batchSize);
-        
-        for (const faqData of batch) {
-          const { rowNumber, ...faqRecord } = faqData;
-          
-          try {
-            // Use upsert with on_conflict to handle duplicates
-            const { data, error } = await supabase
-              .from('faqs')
-              .upsert(faqRecord, { 
-                onConflict: 'slug',
-                ignoreDuplicates: false 
-              })
-              .select('id');
-
-            if (error) {
-              processingErrors.push(`Row ${rowNumber}: ${error.message}`);
-            } else {
-              // Check if this was an insert or update by seeing if slug existed
-              const wasExisting = existingSlugs.has(faqRecord.slug);
-              if (wasExisting) {
-                updatedCount++;
-              } else {
-                createdCount++;
-              }
-            }
-          } catch (error) {
-            processingErrors.push(`Row ${rowNumber}: ${error instanceof Error ? error.message : 'Unknown error'}`);
-          }
-        }
-      }
-
-      const successMessage = `CSV processed: ${createdCount} created, ${updatedCount} updated`;
-      const errorMessage = processingErrors.length > 0 ? `\n\nErrors:\n${processingErrors.slice(0, 5).join('\n')}${processingErrors.length > 5 ? '\n...and more' : ''}` : '';
-
-      toast({
-        title: processingErrors.length === 0 ? "Success" : "Partially Completed",
-        description: successMessage + errorMessage,
-        variant: processingErrors.length === 0 ? "default" : "destructive",
-      });
-
-      fetchFAQs();
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to process CSV",
-        variant: "destructive",
-      });
-    } finally {
-      setIsUploading(false);
-      // Reset file input
-      event.target.value = '';
-    }
-  };
-
   if (isLoading || isFeedbackLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -545,38 +350,6 @@ const AdminDashboard = () => {
           <h1 className="text-3xl font-bold text-foreground mb-2">
             Dashboard
           </h1>
-          <p className="text-xs text-muted-foreground/80">
-            CSV format: slug, question, answer, tags (semicolon-separated), affected_models (semicolon-separated), is_published (true/false)
-          </p>
-        </div>
-
-        {/* Upload CSV */}
-        <div className="mb-6">
-          <input
-            type="file"
-            accept=".csv"
-            onChange={handleCSVUpload}
-            className="hidden"
-            id="csv-upload"
-          />
-          <Button
-            onClick={() => document.getElementById('csv-upload')?.click()}
-            variant="outline"
-            disabled={isUploading}
-            className="mb-4"
-          >
-            {isUploading ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
-                Uploading...
-              </>
-            ) : (
-              <>
-                <Upload className="w-4 h-4 mr-2" />
-                Upload CSV
-              </>
-            )}
-          </Button>
         </div>
 
         {/* Main Content Tabs */}
