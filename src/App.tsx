@@ -2,9 +2,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 import { useEffect } from "react";
-import { AuthProvider } from "@/hooks/useAuth";
+import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { Footer } from "@/components/Footer";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { trackPageView } from "@/lib/analytics";
@@ -17,6 +17,12 @@ import AdminDashboard from "./pages/AdminDashboard";
 import FAQEditor from "./pages/FAQEditor";
 
 const queryClient = new QueryClient();
+
+const ProtectedRoute = () => {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  return user ? <Outlet /> : <Navigate to="/admin/login" replace />;
+};
 
 const AppContent = () => {
   const location = useLocation();
@@ -33,9 +39,11 @@ const AppContent = () => {
         <Route path="/search" element={<SearchResults />} />
         <Route path="/faq/:slug" element={<FAQDetail />} />
         <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/faq/new" element={<FAQEditor />} />
-        <Route path="/admin/faq/edit/:slug" element={<FAQEditor />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/faq/new" element={<FAQEditor />} />
+          <Route path="/admin/faq/edit/:slug" element={<FAQEditor />} />
+        </Route>
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>

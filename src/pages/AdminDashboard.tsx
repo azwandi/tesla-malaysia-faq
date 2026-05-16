@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { logError } from '@/lib/logger';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Edit2, Trash2, LogOut, Upload, FileText, MessageSquare, CheckCircle, ExternalLink, Search, Tag, Filter, X, Car } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
@@ -94,7 +95,7 @@ const AdminDashboard = () => {
       const tags = await fetchAllTags();
       setAvailableTags(tags);
     } catch (error) {
-      console.error('Failed to load tags:', error);
+      logError('Failed to load tags:', error);
     }
   };
 
@@ -321,7 +322,7 @@ const AdminDashboard = () => {
       });
       fetchFAQs();
     } catch (error) {
-      console.error('Error updating FAQ featured status:', error);
+      logError('Error updating FAQ featured status:', error);
       toast({ 
         title: "Error", 
         description: "Failed to update FAQ featured status",

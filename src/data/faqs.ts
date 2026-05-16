@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { logError } from '@/lib/logger';
 
 export interface FAQ {
   id: string;
@@ -27,7 +28,7 @@ export const fetchFAQs = async (): Promise<FAQ[]> => {
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Error fetching FAQs:', error);
+    logError('Error fetching FAQs:', error);
     return [];
   }
 
@@ -42,8 +43,9 @@ export const searchFAQs = async (query: string): Promise<FAQ[]> => {
     return fetchFAQs();
   }
   
-  const searchTerm = query.toLowerCase();
-  
+  // Strip PostgREST metacharacters to prevent filter-string injection
+  const searchTerm = query.trim().replace(/[(),]/g, '');
+
   const { data, error } = await supabase
     .from('faqs')
     .select('*')
@@ -52,7 +54,7 @@ export const searchFAQs = async (query: string): Promise<FAQ[]> => {
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Error searching FAQs:', error);
+    logError('Error searching FAQs:', error);
     return [];
   }
 
@@ -71,7 +73,7 @@ export const getFAQBySlug = async (slug: string): Promise<FAQ | null> => {
     .single();
 
   if (error) {
-    console.error('Error fetching FAQ by slug:', error);
+    logError('Error fetching FAQ by slug:', error);
     return null;
   }
 
@@ -89,7 +91,7 @@ export const fetchAllTags = async (): Promise<string[]> => {
     .eq('is_published', true);
 
   if (error) {
-    console.error('Error fetching tags:', error);
+    logError('Error fetching tags:', error);
     return [];
   }
 
@@ -152,7 +154,7 @@ export const searchFAQsByTag = async (tag: string): Promise<FAQ[]> => {
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Error searching FAQs by tag:', error);
+    logError('Error searching FAQs by tag:', error);
     return [];
   }
 
@@ -172,7 +174,7 @@ export const searchFAQsByCategory = async (category: string): Promise<FAQ[]> => 
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Error searching FAQs by category:', error);
+    logError('Error searching FAQs by category:', error);
     return [];
   }
 
@@ -193,7 +195,7 @@ export const fetchFeaturedFAQs = async (): Promise<FAQ[]> => {
     .limit(9);
 
   if (error) {
-    console.error('Error fetching featured FAQs:', error);
+    logError('Error fetching featured FAQs:', error);
     return [];
   }
 
@@ -222,7 +224,7 @@ export const fetchFAQsCount = async (): Promise<number> => {
     .eq('is_published', true);
 
   if (error) {
-    console.error('Error fetching FAQ count:', error);
+    logError('Error fetching FAQ count:', error);
     return 0;
   }
 
@@ -238,7 +240,7 @@ export const fetchFAQsCountByCategory = async (category: string): Promise<number
     .eq('category', category);
 
   if (error) {
-    console.error('Error fetching FAQ count by category:', error);
+    logError('Error fetching FAQ count by category:', error);
     return 0;
   }
 

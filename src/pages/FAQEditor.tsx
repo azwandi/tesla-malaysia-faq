@@ -43,10 +43,12 @@ const FAQEditor = () => {
   // localStorage key for persisting form data
   const storageKey = `faq-editor-${isEditing ? slug : 'new'}`;
 
+  const DRAFT_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+
   // Save form data to localStorage whenever faq changes
   useEffect(() => {
     if (faq && !loading) {
-      localStorage.setItem(storageKey, JSON.stringify(faq));
+      localStorage.setItem(storageKey, JSON.stringify({ data: faq, savedAt: Date.now() }));
     }
   }, [faq, storageKey, loading]);
 
@@ -77,16 +79,18 @@ const FAQEditor = () => {
       const savedDraft = localStorage.getItem(storageKey);
       if (savedDraft) {
         try {
-          const parsedDraft = JSON.parse(savedDraft);
-          setFaq(parsedDraft);
-          setLoading(false);
-          toast({
-            title: "Draft Restored",
-            description: "Your unsaved changes have been restored.",
-          });
-          return;
-        } catch (error) {
-          // Invalid saved data, proceed with new FAQ
+          const { data: parsedDraft, savedAt } = JSON.parse(savedDraft);
+          if (parsedDraft && savedAt && Date.now() - savedAt < DRAFT_TTL_MS) {
+            setFaq(parsedDraft);
+            setLoading(false);
+            toast({
+              title: "Draft Restored",
+              description: "Your unsaved changes have been restored.",
+            });
+            return;
+          }
+          localStorage.removeItem(storageKey);
+        } catch {
           localStorage.removeItem(storageKey);
         }
       }
@@ -123,14 +127,18 @@ const FAQEditor = () => {
       const savedDraft = localStorage.getItem(storageKey);
       if (savedDraft) {
         try {
-          const parsedDraft = JSON.parse(savedDraft);
-          setFaq(parsedDraft);
-          toast({
-            title: "Draft Restored",
-            description: "Your unsaved changes have been restored.",
-          });
-        } catch (error) {
-          // Invalid saved data, use original data
+          const { data: parsedDraft, savedAt } = JSON.parse(savedDraft);
+          if (parsedDraft && savedAt && Date.now() - savedAt < DRAFT_TTL_MS) {
+            setFaq(parsedDraft);
+            toast({
+              title: "Draft Restored",
+              description: "Your unsaved changes have been restored.",
+            });
+          } else {
+            localStorage.removeItem(storageKey);
+            setFaq(data);
+          }
+        } catch {
           localStorage.removeItem(storageKey);
           setFaq(data);
         }

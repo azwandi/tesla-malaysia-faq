@@ -7,7 +7,6 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   loading: boolean;
 }
@@ -74,34 +73,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     return { error };
   };
 
-  const signUp = async (email: string, password: string) => {
-    const redirectUrl = `${window.location.origin}/`;
-    
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl
-      }
-    });
-    
-    if (error) {
-      toast({
-        title: "Sign Up Failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Account created!",
-        description: "Please check your email to confirm your account.",
-      });
-    }
-    
-    return { error };
-  };
-
   const signOut = async () => {
+    // Clear all FAQ editor drafts before signing out
+    Object.keys(localStorage)
+      .filter(key => key.startsWith('faq-editor-'))
+      .forEach(key => localStorage.removeItem(key));
     await supabase.auth.signOut();
     toast({
       title: "Signed out",
@@ -113,7 +89,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     user,
     session,
     signIn,
-    signUp,
     signOut,
     loading,
   };

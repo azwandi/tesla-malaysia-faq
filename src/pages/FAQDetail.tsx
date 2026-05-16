@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { getFAQBySlug, fetchRelatedFAQs, FAQ } from "@/data/faqs";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeSanitize from 'rehype-sanitize';
 import { FeedbackForm } from "@/components/FeedbackForm";
 import { REFERRAL_URL, REFERRAL_DISCOUNT, PURCHASE_INTENT_CATEGORIES, PURCHASE_INTENT_TAGS } from "@/lib/referral";
 import { trackEvent } from "@/lib/analytics";
@@ -213,6 +214,7 @@ export default function FAQDetail() {
         <div className="prose-reading animate-fade-up stagger-3">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeSanitize]}
             components={{
               p: ({ children }) => (
                 <p className="mb-5 leading-[1.85] text-foreground/90 text-lg">{children}</p>

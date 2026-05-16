@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { logError } from "@/lib/logger";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -80,7 +81,7 @@ export function FeedbackForm({ faqId, faqSlug }: FeedbackFormProps) {
       form.reset();
       setOpen(false);
     } catch (error) {
-      console.error("Error submitting feedback:", error);
+      logError("Error submitting feedback:", error);
       toast({
         title: "Error submitting feedback",
         description: "Please try again later.",
