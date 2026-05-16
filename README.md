@@ -10,8 +10,8 @@ A community-driven FAQ platform for Tesla owners and prospective buyers in Malay
 - **Categories** — Browse by topic: Charging & Battery, Costs & Savings, Maintenance, Safety, Models & Variants, etc.
 - **Tags** — Filter FAQs by tag or affected Tesla model
 - **FAQ detail pages** — Individual pages with user feedback forms
-- **Admin dashboard** — Manage FAQs with publish/draft/featured toggles, tag filters, and bulk CSV import
-- **Supabase backend** — Row-level security with public read access and authenticated write access
+- **Admin dashboard** — Manage FAQs with publish/draft/featured toggles and tag filters
+- **Supabase backend** — Row-level security with public read access and admin-only write access
 - **PostHog analytics** — Public pageviews plus FAQ, search, feedback, and referral tracking
 
 ## Tech Stack
@@ -20,11 +20,11 @@ A community-driven FAQ platform for Tesla owners and prospective buyers in Malay
 |---|---|
 | Frontend | React 18, TypeScript, Vite |
 | Styling | Tailwind CSS, shadcn/ui |
-| Routing | React Router v6 |
+| Routing | React Router v7 |
 | Data fetching | TanStack Query v5 |
 | Backend | Supabase (PostgreSQL + Auth) |
 | Analytics | PostHog |
-| Markdown | react-markdown, remark-gfm |
+| Markdown | react-markdown, remark-gfm, rehype-sanitize |
 
 ## Getting Started
 
@@ -141,19 +141,26 @@ The main `faqs` table in Supabase:
 | `created_at` | TIMESTAMPTZ | Auto-set on insert |
 | `updated_at` | TIMESTAMPTZ | Auto-updated on change |
 
-Row-level security is enabled: public users can read published FAQs, authenticated users can create, update, and delete.
+Row-level security is enabled: public users can read published FAQs; only users in the `admin_users` table can create, update, and delete.
 
 ## Admin Panel
 
 Access the admin dashboard at `/admin/login`. Requires a Supabase authenticated account.
 
-To create admin credentials, go to your Supabase project → **Authentication → Users → Add user**. Enter an email and password — these are what you'll use to log in at `/admin/login`. There is no self-registration; accounts must be created manually through the Supabase dashboard.
+To create admin credentials:
+
+1. Go to your Supabase project → **Authentication → Users → Add user**. Enter an email and password.
+2. Copy the new user's UUID, then run in the Supabase SQL editor:
+   ```sql
+   INSERT INTO public.admin_users (user_id) VALUES ('<uuid>');
+   ```
+
+There is no self-registration; accounts must be created manually. Only users present in `admin_users` can write to the database.
 
 Features:
 - Filter FAQs by search query, tag, or publish status
 - Toggle published/featured status per FAQ
-- Create and edit FAQs with a rich form editor
-- **Bulk CSV import** — Upload a `.csv` file with columns: `slug`, `question`, `answer`, `tags` (semicolon-separated), `affected_models` (semicolon-separated), `is_published` (`true`/`false`)
+- Create and edit FAQs with a rich form editor (drafts auto-saved to localStorage for 24 h)
 - Review and resolve user feedback submissions
 
 ## FAQ Categories

@@ -23,7 +23,9 @@ All Supabase query functions live in `src/data/faqs.ts` and are called directly 
 
 ### Auth
 
-`src/hooks/useAuth.tsx` provides an `AuthProvider` and `useAuth` hook wrapping Supabase Auth. Admin users must be manually created in the Supabase dashboard (Authentication → Users). There is no self-registration flow for admins. The `useAuth` hook must be used inside `AuthProvider` (already set up in `App.tsx`).
+`src/hooks/useAuth.tsx` provides an `AuthProvider` and `useAuth` hook wrapping Supabase Auth. Admin users must be manually created in the Supabase dashboard (Authentication → Users). There is no self-registration flow for admins — `signUp` is intentionally not exposed. The `useAuth` hook must be used inside `AuthProvider` (already set up in `App.tsx`).
+
+Admin routes (`/admin`, `/admin/faq/new`, `/admin/faq/edit/:slug`) are wrapped by a `ProtectedRoute` component in `App.tsx` that redirects unauthenticated users to `/admin/login` before any page content or data fetching occurs.
 
 ### Routing
 
@@ -58,6 +60,14 @@ Both are found in the Supabase project under **Settings → API**.
 
 ## Database
 
-The `faqs` table has row-level security: public users can read `is_published = true` rows; authenticated users can write. Key columns: `slug` (unique URL key), `tags` (TEXT[]), `affected_models` (TEXT[]), `category` (one of 8 fixed values in `faqCategories` exported from `src/data/faqs.ts`), `competitor_info` (JSONB), `featured` (boolean).
+The `faqs` table has row-level security: public users can read `is_published = true` rows; only admin users can write. Key columns: `slug` (unique URL key), `tags` (TEXT[]), `affected_models` (TEXT[]), `category` (one of 8 fixed values in `faqCategories` exported from `src/data/faqs.ts`), `competitor_info` (JSONB), `featured` (boolean).
 
-The admin dashboard supports bulk CSV import with columns: `slug`, `question`, `answer`, `tags` (semicolon-separated), `affected_models` (semicolon-separated), `is_published` (`true`/`false`).
+Write access is restricted to rows in the `admin_users` table (checked via the `is_admin()` RLS function). After creating a new Supabase auth user, you must also insert their UUID into `admin_users`:
+
+```sql
+INSERT INTO public.admin_users (user_id) VALUES ('<auth-user-uuid>');
+```
+
+## Logging
+
+Use `logError` from `src/lib/logger.ts` instead of `console.error` throughout the codebase. It silently no-ops in production builds to avoid leaking internal Supabase error details (table names, constraint names, policy names) to the browser console.
