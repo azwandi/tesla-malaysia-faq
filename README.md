@@ -2,7 +2,7 @@
 
 A community-driven FAQ platform for Tesla owners and prospective buyers in Malaysia. Covers topics like charging costs, government incentives, maintenance comparisons, Autopilot legality, and more — all tailored to local conditions.
 
-**Live site: [jomtesla.my](https://jomtesla.my)**
+**Live site: [jomtesla.heimastudio.xyz](https://jomtesla.heimastudio.xyz)**
 
 ## Features
 

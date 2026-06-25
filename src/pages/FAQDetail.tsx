@@ -93,7 +93,7 @@ export default function FAQDetail() {
   const plainAnswer = faq.answer.replace(/[#*`]/g, '');
   const description = plainAnswer.slice(0, 155).trim() + '…';
   const pageTitle = `${faq.question} | JomTesla`;
-  const pageUrl = `https://jomtesla.my/faq/${faq.slug}`;
+  const pageUrl = `https://jomtesla.heimastudio.xyz/faq/${faq.slug}`;
   const handleReferralClick = (placement: "faq_high_intent" | "faq_low_intent") => {
     trackEvent("referral_clicked", {
       faq_slug: faq.slug,
